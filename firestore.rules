@@ -1,0 +1,50 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return signedIn()
+        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.active == true;
+    }
+
+    function signedInWithVerifiedEmail() {
+      return signedIn()
+        && request.auth.token.email != null
+        && request.auth.token.email_verified == true;
+    }
+
+    function approvedEmail(emailKey) {
+      return exists(/databases/$(database)/documents/adminEmails/$(emailKey))
+        && get(/databases/$(database)/documents/adminEmails/$(emailKey)).data.active == true
+        && get(/databases/$(database)/documents/adminEmails/$(emailKey)).data.email == request.auth.token.email;
+    }
+
+    match /site/announcements {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /admins/{uid} {
+      allow get: if isAdmin() || (signedIn() && request.auth.uid == uid);
+      allow list: if isAdmin();
+      allow create: if request.auth.uid == uid
+        && signedInWithVerifiedEmail()
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.active == true
+        && request.resource.data.role == "admin"
+        && request.resource.data.emailKey is string
+        && approvedEmail(request.resource.data.emailKey);
+      allow update, delete: if isAdmin();
+    }
+
+    match /adminEmails/{emailKey} {
+      allow get: if isAdmin()
+        || (signedInWithVerifiedEmail() && resource.data.email == request.auth.token.email);
+      allow list, create, update, delete: if isAdmin();
+    }
+  }
+}

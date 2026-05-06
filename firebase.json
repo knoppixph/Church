@@ -1,0 +1,35 @@
+{
+  "hosting": {
+    "public": "church-page-main",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "admin-auth.json",
+      "admin-db.json",
+      "admin-mail.json",
+      "announcements.pdf",
+      "announcements.pptx"
+    ],
+    "rewrites": [
+      {
+        "source": "/",
+        "destination": "/church_HOME.html"
+      }
+    ],
+    "headers": [
+      {
+        "source": "**/*.{html,js,css}",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
+          }
+        ]
+      }
+    ]
+  },
+  "firestore": {
+    "rules": "firestore.rules"
+  }
+}

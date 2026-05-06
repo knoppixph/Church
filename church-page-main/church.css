@@ -225,10 +225,72 @@ body.admin-page .main-nav a[href*="admin"] {
     line-height: 1.6;
 }
 
+.admin-list {
+    margin-top: 16px;
+}
+
+.admin-auth-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 18px;
+}
+
+.admin-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.admin-list h4 {
+    margin: 16px 0 8px;
+}
+
+.admin-list ul {
+    list-style: none;
+    display: grid;
+    gap: 8px;
+    padding: 0;
+    margin: 0;
+}
+
+.admin-list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 12px;
+    border: 1px solid var(--stroke);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.admin-list small {
+    color: var(--muted);
+    text-align: right;
+    overflow-wrap: anywhere;
+}
+
+.text-button {
+    border: 0;
+    background: transparent;
+    color: var(--primary);
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 0;
+}
+
 .login-form {
     display: grid;
     gap: 12px;
     max-width: 360px;
+}
+
+.login-form.wide-form {
+    max-width: 720px;
 }
 
 .login-form input {
@@ -291,6 +353,12 @@ body.admin-page .main-nav a[href*="admin"] {
     color: var(--text);
 }
 
+.button.is-disabled,
+.button[aria-disabled="true"] {
+    opacity: 0.55;
+    pointer-events: none;
+}
+
 .info-grid {
     margin-top: 24px;
     display: grid;
@@ -350,6 +418,17 @@ body.admin-page .main-nav a[href*="admin"] {
 .footer-grid p {
     margin: 0 0 6px;
     color: var(--muted);
+}
+
+.footer-grid .map-link {
+    color: var(--muted);
+    text-decoration: none;
+}
+
+.footer-grid .map-link:hover,
+.footer-grid .map-link:focus-visible {
+    color: var(--text);
+    text-decoration: underline;
 }
 
 /* Existing leaderboard styles start here */

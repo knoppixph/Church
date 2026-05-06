@@ -41,31 +41,24 @@
             <div class="doc-frame-wrap">
                 <iframe
                     class="doc-frame"
+                    id="announcementPdfFrame"
                     title="Announcements PDF"
-                    src="announcements.pdf?v=20260407#page=1&zoom=page-fit&toolbar=0&navpanes=0&scrollbar=1"
                     loading="lazy"
                     scrolling="yes"
                 ></iframe>
             </div>
             <div class="cta-group" style="margin-top:12px;">
-                <a class="button primary" href="announcements.pdf?v=20260407" download>Download PDF</a>
-                <a class="button ghost" href="announcements.pptx?v=20260407" download>Download PPTX</a>
+                <a class="button primary" href="#" id="announcementPdfLink" target="_blank" rel="noopener noreferrer">Open PDF</a>
+                <a class="button ghost" href="#" id="announcementPptxLink" target="_blank" rel="noopener noreferrer">Open PPTX</a>
             </div>
-            <p class="doc-note">Want to update the file? Go to the <a href="admin.html">Admin page</a>. Everyone else can view or download the PDF/PPTX above.</p>
+            <p class="doc-note" id="announcementStatus" aria-live="polite">Loading announcements...</p>
+            <p class="doc-note" id="announcementUpdatedAt"></p>
         </section>
 
         <section class="info-grid">
             <article class="card">
-                <h3>What to post</h3>
-                <p>Schedules, venue updates, baptisms, training dates, and testimonies.</p>
-            </article>
-            <article class="card">
                 <h3>Who to contact</h3>
                 <p>Email updates to <a href="mailto:jciotrim@gmail.com">jciotrim@gmail.com</a> so we can publish them here.</p>
-            </article>
-            <article class="card">
-                <h3>Tip</h3>
-                <p>Keep every item to 2-3 sentences so members can scan quickly.</p>
             </article>
         </section>
     </main>
@@ -79,7 +72,7 @@
             </div>
             <div>
                 <h4>Visit</h4>
-                <p>#009 Doon St. Maysan Valenzuela City, Valenzuela, Philippines</p>
+                <p><a class="map-link" href="https://maps.app.goo.gl/aEq7nhKFkA9rVEP46" target="_blank" rel="noopener noreferrer">#009 Doon St. Maysan Valenzuela City, Valenzuela, Philippines</a></p>
             </div>
             <div>
                 <h4>Contact</h4>
@@ -90,5 +83,6 @@
             </div>
         </div>
     </footer>
+    <script type="module" src="firebase-announcements.js"></script>
 </body>
 </html>

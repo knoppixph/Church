@@ -34,63 +34,91 @@
     <main class="shell page-content">
         <section class="page-hero">
             <p class="eyebrow">Admin</p>
-            <h2>Manage announcements files</h2>
-            <p class="lede">Sign in, then upload the latest PDF/PPTX. Files are saved on the server and replace the public downloads instantly.</p>
-            <p class="doc-note" id="sheetStatus" aria-live="polite">Backend ready. Waiting for login…</p>
+            <h2>Manage announcement links</h2>
+            <p class="lede">Sign in with Firebase, then publish the latest PDF/PPTX links for the public announcements page.</p>
+            <p class="doc-note" id="sheetStatus" aria-live="polite">Firebase ready. Waiting for login...</p>
         </section>
 
         <section class="doc-section" id="authSection">
-            <div class="card">
-                <h3>Admin sign-in</h3>
-                <form id="loginForm" class="login-form">
-                    <label>Email<br><input type="email" id="email" autocomplete="username" required></label>
-                    <label>Password<br><input type="password" id="password" autocomplete="current-password" required></label>
-                    <button type="submit" class="button primary">Sign in</button>
-                    <p class="doc-note" id="loginStatus" aria-live="polite"></p>
-                </form>
+            <div class="admin-auth-grid">
+                <div class="card">
+                    <h3>Admin sign-in</h3>
+                    <form id="loginForm" class="login-form">
+                        <label>Email<br><input type="email" id="identifier" autocomplete="username" required></label>
+                        <label>Password<br><input type="password" id="password" autocomplete="current-password" required></label>
+                        <button type="submit" class="button primary">Sign in</button>
+                        <p class="doc-note" id="loginStatus" aria-live="polite"></p>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h3>Create approved account</h3>
+                    <form id="registerForm" class="login-form">
+                        <label>Email<br><input type="email" id="registerEmail" autocomplete="email" required></label>
+                        <label>Password<br><input type="password" id="registerPassword" autocomplete="new-password" required></label>
+                        <label>Confirm password<br><input type="password" id="registerConfirm" autocomplete="new-password" required></label>
+                        <button type="submit" class="button ghost">Create account</button>
+                        <p class="doc-note" id="registerStatus" aria-live="polite"></p>
+                    </form>
+                </div>
             </div>
         </section>
 
         <section class="doc-section" id="adminSection" hidden>
-            <div class="cta-group">
-                <a class="button primary" href="announcements.pdf" download id="pdfLink">Download current PDF</a>
-                <a class="button ghost" href="announcements.pptx" download id="pptxLink">Download current PPTX</a>
+            <div class="admin-toolbar">
+                <p class="doc-note" id="currentAdmin"></p>
+                <button type="button" class="button ghost" id="logoutButton">Sign out</button>
             </div>
 
-            <article class="card admin-note">
-                <h3>How to update</h3>
-                <ol class="admin-steps">
-                    <li>Select a new PDF or PPTX below (one or both). Filenames are forced to <strong>announcements.pdf</strong> and <strong>announcements.pptx</strong> automatically.</li>
-                    <li>Click <strong>Upload</strong>. Successful uploads replace the public downloads immediately.</li>
-                    <li>Open <a href="announcement.html">announcement.html</a> to confirm the preview; add <code>?v=1</code> if the browser caches the old file.</li>
-                </ol>
-            </article>
+            <div class="cta-group">
+                <a class="button primary" href="#" target="_blank" rel="noopener noreferrer" id="pdfLink">Open current PDF</a>
+                <a class="button ghost" href="#" target="_blank" rel="noopener noreferrer" id="pptxLink">Open current PPTX</a>
+            </div>
+            <p class="doc-note"><span id="pdfName">Checking PDF...</span> | <span id="pptxName">Checking PPTX...</span> | <span id="updatedAt">Checking update time...</span></p>
 
             <article class="card">
-                <h3>Upload announcements</h3>
-                <form id="uploadForm" class="login-form" enctype="multipart/form-data">
-                    <label>PDF file (optional)<br><input type="file" id="pdfFile" name="pdf" accept="application/pdf"></label>
-                    <label>PPTX file (optional)<br><input type="file" id="pptxFile" name="pptx" accept=".pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/vnd.ms-powerpoint"></label>
-                    <button type="submit" class="button primary">Upload</button>
-                    <p class="doc-note" id="uploadStatus" aria-live="polite"></p>
+                <h3>Announcement links</h3>
+                <form id="announcementLinksForm" class="login-form wide-form">
+                    <label>PDF link<br><input type="url" id="pdfUrl" placeholder="https://drive.google.com/file/d/..." autocomplete="off"></label>
+                    <label>PPTX link<br><input type="url" id="pptxUrl" placeholder="https://drive.google.com/file/d/..." autocomplete="off"></label>
+                    <button type="submit" class="button primary">Save links</button>
+                    <p class="doc-note" id="linkStatus" aria-live="polite"></p>
+                </form>
+            </article>
+
+            <article class="card" id="changePasswordCard">
+                <h3>Change password</h3>
+                <form id="changePasswordForm" class="login-form">
+                    <label>Current password<br><input type="password" id="currentPassword" autocomplete="current-password" required></label>
+                    <label>New password<br><input type="password" id="newPassword" autocomplete="new-password" required></label>
+                    <label>Confirm new password<br><input type="password" id="confirmPassword" autocomplete="new-password" required></label>
+                    <button type="submit" class="button primary">Update password</button>
+                    <p class="doc-note" id="passwordStatus" aria-live="polite"></p>
                 </form>
             </article>
 
             <article class="card">
-                <h3>Remove current files</h3>
+                <h3>Clear announcement links</h3>
                 <div class="cta-group">
-                    <button type="button" class="button ghost" id="removePdf">Remove PDF</button>
-                    <button type="button" class="button ghost" id="removePptx">Remove PPTX</button>
+                    <button type="button" class="button ghost" id="removePdf">Clear PDF</button>
+                    <button type="button" class="button ghost" id="removePptx">Clear PPTX</button>
                 </div>
                 <p class="doc-note" id="removeStatus" aria-live="polite"></p>
             </article>
 
-            <div class="doc-frame-wrap">
-                <object class="doc-frame" data="announcements.pdf" type="application/pdf" id="pdfFrame">
-                    <p>Preview unavailable. <a href="announcements.pdf">Open the PDF</a>.</p>
-                </object>
+            <article class="card">
+                <h3>Approve technical admin</h3>
+                <form id="approveAdminForm" class="login-form">
+                    <label>Email<br><input type="email" id="approveEmail" autocomplete="email" required></label>
+                    <button type="submit" class="button primary">Approve email</button>
+                    <p class="doc-note" id="inviteStatus" aria-live="polite"></p>
+                </form>
+                <div class="admin-list" id="adminList" aria-live="polite"></div>
+            </article>
+
+            <div class="doc-frame-wrap" id="adminPreviewWrap">
+                <iframe class="doc-frame" title="Announcement PDF preview" id="pdfFrame" loading="lazy"></iframe>
             </div>
-            <p class="doc-note">If the preview doesn't refresh, clear the browser cache or append <code>?v=1</code> to the URL.</p>
         </section>
     </main>
 
@@ -103,7 +131,7 @@
             </div>
             <div>
                 <h4>Visit</h4>
-                <p>#009 Doon St. Maysan Valenzuela City, Valenzuela, Philippines</p>
+                <p><a class="map-link" href="https://maps.app.goo.gl/aEq7nhKFkA9rVEP46" target="_blank" rel="noopener noreferrer">#009 Doon St. Maysan Valenzuela City, Valenzuela, Philippines</a></p>
             </div>
             <div>
                 <h4>Contact</h4>
@@ -112,160 +140,6 @@
         </div>
     </footer>
 
-    <script>
-      const API_BASE = "";
-
-      const sheetStatus = document.getElementById("sheetStatus");
-      const loginStatus = document.getElementById("loginStatus");
-      const uploadStatus = document.getElementById("uploadStatus");
-      const removeStatus = document.getElementById("removeStatus");
-      const authSection = document.getElementById("authSection");
-      const adminSection = document.getElementById("adminSection");
-      const pdfLink = document.getElementById("pdfLink");
-      const pptxLink = document.getElementById("pptxLink");
-      const pdfFrame = document.getElementById("pdfFrame");
-      const pdfName = document.getElementById("pdfName");
-      const pptxName = document.getElementById("pptxName");
-
-      function setStatus(el, msg, isError = false) {
-        if (!el) return;
-        el.textContent = msg;
-        el.style.color = isError ? "#f29b9b" : "";
-      }
-
-      function markFilePresence(status) {
-        const hasPdf = status.files?.includes("pdf");
-        const hasPptx = status.files?.includes("pptx");
-        pdfLink.style.opacity = hasPdf ? "1" : "0.5";
-        pptxLink.style.opacity = hasPptx ? "1" : "0.5";
-        pdfLink.style.pointerEvents = hasPdf ? "auto" : "none";
-        pptxLink.style.pointerEvents = hasPptx ? "auto" : "none";
-        pdfFrame.data = hasPdf ? pdfLink.href : "";
-        pdfName.textContent = hasPdf ? "announcements.pdf" : "PDF not uploaded";
-        pptxName.textContent = hasPptx ? "announcements.pptx" : "PPTX not uploaded";
-      }
-
-      function token() {
-        return localStorage.getItem("adminToken") || "";
-      }
-
-      function saveToken(value) {
-        if (value) localStorage.setItem("adminToken", value);
-      }
-
-      async function api(path, opts = {}) {
-        const headers = opts.headers || {};
-        if (token()) headers["Authorization"] = `Bearer ${token()}`;
-        const res = await fetch(API_BASE + path, { ...opts, headers });
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok) {
-          if (res.status === 401) {
-            localStorage.removeItem("adminToken");
-            throw new Error("Please sign in to continue.");
-          }
-          const msg = data?.error || res.statusText;
-          throw new Error(msg);
-        }
-        return data;
-      }
-
-      function showAuthed(email) {
-        authSection.hidden = true;
-        adminSection.hidden = false;
-        setStatus(sheetStatus, `Signed in as ${email}`);
-      }
-
-      async function handleLogin(event) {
-        event.preventDefault();
-        setStatus(loginStatus, "Checking...");
-        try {
-          const email = document.getElementById("email").value.trim();
-          const password = document.getElementById("password").value;
-          const data = await api("/api/login", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password })
-          });
-          saveToken(data.token);
-          showAuthed(data.email || email);
-          setStatus(loginStatus, "Welcome, admin.");
-        } catch (err) {
-          setStatus(loginStatus, err.message, true);
-        }
-      }
-
-      async function handleUpload(event) {
-        event.preventDefault();
-        const pdfFile = document.getElementById("pdfFile").files[0];
-        const pptxFile = document.getElementById("pptxFile").files[0];
-        if (!pdfFile && !pptxFile) {
-          setStatus(uploadStatus, "Choose a PDF or PPTX first.", true);
-          return;
-        }
-        setStatus(uploadStatus, "Uploading...");
-        try {
-          const fd = new FormData();
-          if (pdfFile) fd.append("pdf", pdfFile);
-          if (pptxFile) fd.append("pptx", pptxFile);
-          await api("/api/upload-announcement", { method: "POST", body: fd });
-          setStatus(uploadStatus, "Uploaded. Reload announcement page to see the new files.");
-          // bump cache
-          pdfLink.href = `announcements.pdf?v=${Date.now()}`;
-          pptxLink.href = `announcements.pptx?v=${Date.now()}`;
-          pdfFrame.data = pdfLink.href;
-          await refreshStatus();
-        } catch (err) {
-          setStatus(uploadStatus, err.message, true);
-        }
-      }
-
-      async function handleRemove(kind) {
-        setStatus(removeStatus, `Removing ${kind.toUpperCase()}...`);
-        try {
-          await api("/api/delete-announcement", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ kind })
-          });
-          setStatus(removeStatus, `${kind.toUpperCase()} removed.`);
-          const bust = Date.now();
-          if (kind === "pdf") {
-            pdfLink.href = `announcements.pdf?v=${bust}`;
-            pdfFrame.data = pdfLink.href;
-          } else {
-            pptxLink.href = `announcements.pptx?v=${bust}`;
-          }
-          await refreshStatus();
-        } catch (err) {
-          setStatus(removeStatus, err.message, true);
-        }
-      }
-
-      async function refreshStatus() {
-        try {
-          const status = await api("/api/status");
-          markFilePresence(status);
-        } catch (err) {
-          console.warn("Status check failed:", err);
-        }
-      }
-
-      async function tryAutoLogin() {
-        if (!token()) return;
-        try {
-          const data = await api("/api/me");
-          showAuthed(data.email || "admin");
-        } catch {
-          localStorage.removeItem("adminToken");
-        }
-      }
-
-      document.getElementById("loginForm").addEventListener("submit", handleLogin);
-      document.getElementById("uploadForm").addEventListener("submit", handleUpload);
-      document.getElementById("removePdf").addEventListener("click", () => handleRemove("pdf"));
-      document.getElementById("removePptx").addEventListener("click", () => handleRemove("pptx"));
-      tryAutoLogin();
-      refreshStatus();
-    </script>
+    <script type="module" src="firebase-admin.js"></script>
 </body>
 </html>

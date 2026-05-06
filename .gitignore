@@ -1,5 +1,11 @@
+# Dependencies stay local. GitHub should keep package.json/package-lock.json,
+# then recreate this folder with npm install on the PC/server.
 node_modules/
+**/node_modules/
+
+# Local editor/runtime files
 .vscode/
+**/.vscode/
 temp.patch
 *.log
 .DS_Store
@@ -8,6 +14,16 @@ yarn-debug.log*
 yarn-error.log*
 _package-lock.json
 _site/
+.firebase/
+firebase-debug.log*
+firestore-debug.log*
+
+# Local server/session files. Keep examples/docs in Git, not live sessions.
+church-page-main/admin-auth.json
+church-page-main/admin-db.json
+church-page-main/admin-mail.json
+church-page-main/announcements.pdf
+church-page-main/announcements.pptx
 
 # ignore embedded git metadata if recreated
 _reference_church_page/.git
