@@ -283,6 +283,11 @@ body.admin-page .main-nav a[href*="admin"] {
     padding: 0;
 }
 
+.form-link {
+    justify-self: start;
+    margin-top: -4px;
+}
+
 .login-form {
     display: grid;
     gap: 12px;

@@ -7,6 +7,7 @@ import {
     onAuthStateChanged,
     reauthenticateWithCredential,
     reload,
+    sendPasswordResetEmail,
     sendEmailVerification,
     signInWithEmailAndPassword,
     signOut,
@@ -225,6 +226,26 @@ async function handleLogin(event) {
     try {
         await signInWithEmailAndPassword(auth, email, password);
         setStatus(loginStatus, "Welcome.");
+    } catch (err) {
+        setStatus(loginStatus, err.message, true);
+    }
+}
+
+async function handleForgotPassword() {
+    const email = document.getElementById("identifier").value.trim();
+    if (!email) {
+        setStatus(loginStatus, "Enter your admin email first.", true);
+        document.getElementById("identifier").focus();
+        return;
+    }
+
+    setStatus(loginStatus, "Sending password reset email...");
+
+    try {
+        await sendPasswordResetEmail(auth, email, {
+            url: `${window.location.origin}${window.location.pathname}`
+        });
+        setStatus(loginStatus, "Password reset email sent. Check your inbox or spam folder.");
     } catch (err) {
         setStatus(loginStatus, err.message, true);
     }
@@ -602,6 +623,7 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 document.getElementById("loginForm").addEventListener("submit", handleLogin);
+document.getElementById("forgotPasswordButton").addEventListener("click", handleForgotPassword);
 document.getElementById("registerForm").addEventListener("submit", handleCreateAccount);
 document.getElementById("announcementLinksForm").addEventListener("submit", handleSaveLinks);
 document.getElementById("changePasswordForm").addEventListener("submit", handleChangePassword);
