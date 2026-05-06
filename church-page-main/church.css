@@ -1,0 +1,946 @@
+:root {
+    --bg: #140028;
+    --bg-soft: #1a0b38;
+    --card: #1b0f33;
+    --primary: #c94bff;
+    --primary-strong: #9b3cff;
+    --accent: #4aa0ff;
+    --text: #f3f2ff;
+    --muted: #c1b6d8;
+    --stroke: rgba(255, 255, 255, 0.14);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Manrope', 'Segoe UI', Arial, sans-serif;
+    background:
+        radial-gradient(circle at 12% 18%, rgba(201, 75, 255, 0.22), transparent 24%),
+        radial-gradient(circle at 84% 12%, rgba(74, 160, 255, 0.22), transparent 26%),
+        linear-gradient(135deg, #2a0046 0%, #1a005f 46%, #001f8f 100%);
+    color: var(--text);
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+}
+
+a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+a:hover {
+    color: var(--primary-strong);
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+.shell {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.site-header {
+    background: linear-gradient(90deg, rgba(33, 4, 58, 0.92), rgba(7, 11, 68, 0.95));
+    border-bottom: 1px solid var(--stroke);
+    box-shadow: 0 18px 32px rgba(0, 0, 0, 0.22);
+}
+
+.masthead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 18px 0;
+    flex-wrap: wrap;
+}
+
+.logo-badge {
+    height: 86px;
+    width: 86px;
+    border-radius: 18px;
+    object-fit: cover;
+    background: #0b1222;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
+}
+
+.brand-block {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1 1 0;
+    min-width: 0;
+    gap: 0;
+}
+
+.brand-slogan {
+    margin: 0;
+    text-transform: uppercase;
+    text-align: center;
+    width: 100%;
+}
+
+.brand-slogan-top {
+    display: block;
+    font-family: "League Spartan", "Manrope", "Segoe UI", Arial, sans-serif;
+    font-size: clamp(2.1rem, 6.2vw, 4.4rem);
+    letter-spacing: 0;
+    font-weight: 900;
+    line-height: 0.78;
+    color: var(--text);
+}
+
+.brand-slogan-bottom {
+    display: block;
+    margin-top: 14px;
+    font-family: "League Spartan", "Manrope", "Segoe UI", Arial, sans-serif;
+    font-size: clamp(0.68rem, 2vw, 1.35rem);
+    letter-spacing: 0;
+    font-weight: 900;
+    line-height: 0.95;
+    color: var(--text);
+    white-space: nowrap;
+}
+
+.brand-block h1 {
+    margin: 4px 0 0;
+    font-family: "League Spartan", "Manrope", "Segoe UI", Arial, sans-serif;
+    font-size: clamp(1rem, 2.4vw, 1.7rem);
+    letter-spacing: 0;
+    text-transform: uppercase;
+    font-weight: 900;
+    line-height: 0.95;
+    color: var(--text);
+}
+
+.eyebrow {
+    margin: 0;
+    font-size: 0.85rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+.main-nav {
+    border-top: 1px solid var(--stroke);
+}
+
+.main-nav ul {
+    list-style: none;
+    display: flex;
+    gap: 12px;
+    padding: 12px 0 18px;
+    margin: 0;
+}
+
+.main-nav a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    color: var(--text);
+    border-radius: 12px;
+    transition: all 150ms ease;
+}
+
+.main-nav a:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--primary-strong);
+}
+
+body.home-page .main-nav a[href*="church_HOME"],
+body.announcement-page .main-nav a[href*="announcement"],
+body.leaderboard-page .main-nav a[href*="leaderboard"],
+body.admin-page .main-nav a[href*="admin"] {
+    background: rgba(240, 180, 41, 0.14);
+    color: var(--primary-strong);
+    box-shadow: inset 0 0 0 1px rgba(240, 180, 41, 0.28);
+}
+
+.page-content {
+    padding: 32px 0 48px;
+}
+
+.page-hero {
+    background: linear-gradient(110deg, #3a046d 0%, #3713b5 50%, #0a32ff 100%);
+    border: 1px solid var(--stroke);
+    border-radius: 18px;
+    padding: 32px;
+    box-shadow: 0 18px 36px rgba(0, 0, 0, 0.22);
+    text-align: left;
+}
+
+.doc-section {
+    margin: 26px 0 32px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 22px 22px 26px;
+    box-shadow: 0 22px 44px rgba(0, 0, 0, 0.30);
+}
+
+.doc-frame-wrap {
+    margin-top: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 18px 36px rgba(0, 0, 0, 0.34);
+    background: linear-gradient(135deg, rgba(255,255,255,0.09), rgba(255,255,255,0.04));
+}
+
+.doc-frame {
+    width: 100%;
+    height: 1200px;
+    border: 0;
+    display: block;
+    background: #101018;
+}
+
+.doc-note {
+    margin: 10px 0 0;
+    color: var(--muted);
+    font-size: 0.95rem;
+}
+
+.admin-note {
+    margin-top: 18px;
+}
+
+.admin-steps {
+    padding-left: 20px;
+    margin: 10px 0 0;
+    color: var(--text);
+}
+
+.admin-steps li {
+    margin: 6px 0;
+    line-height: 1.6;
+}
+
+.login-form {
+    display: grid;
+    gap: 12px;
+    max-width: 360px;
+}
+
+.login-form input {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--stroke);
+    background: rgba(255,255,255,0.04);
+    color: var(--text);
+}
+
+.footer-admin-link a {
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+.page-hero h2 {
+    margin: 8px 0 10px;
+    font-size: 2.1rem;
+    letter-spacing: -0.01em;
+}
+
+.lede {
+    color: var(--muted);
+    max-width: 720px;
+    margin: 0 0 18px;
+}
+
+.cta-group {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+
+.button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-weight: 700;
+    border: 1px solid transparent;
+    transition: transform 140ms ease, box-shadow 140ms ease, background 140ms ease;
+}
+
+.button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+}
+
+.button.primary {
+    background: linear-gradient(120deg, #c94bff, #7e3cff);
+    color: #f9f7ff;
+}
+
+.button.ghost {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: var(--stroke);
+    color: var(--text);
+}
+
+.info-grid {
+    margin-top: 24px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+}
+
+.card {
+    background: linear-gradient(135deg, rgba(34, 9, 68, 0.92), rgba(17, 7, 54, 0.9));
+    border: 1px solid var(--stroke);
+    border-radius: 16px;
+    padding: 18px;
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.2);
+    text-align: left;
+}
+
+.card h3 {
+    margin: 0 0 8px;
+    font-size: 1.1rem;
+}
+
+.card p {
+    margin: 0;
+    color: var(--muted);
+}
+
+.site-footer {
+    background: linear-gradient(90deg, #1c0436 0%, #0c154f 60%, #05173f 100%);
+    border-top: 1px solid var(--stroke);
+    padding: 26px 0 34px;
+    color: var(--muted);
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+    align-items: start;
+}
+
+.footer-logo {
+    height: 72px;
+    width: 72px;
+    border-radius: 14px;
+    object-fit: cover;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.footer-grid a {
+    color: var(--text);
+}
+
+.footer-grid h4 {
+    margin: 4px 0 6px;
+}
+
+.footer-grid p {
+    margin: 0 0 6px;
+    color: var(--muted);
+}
+
+/* Existing leaderboard styles start here */
+.hero-card,
+.leaderboard-shell {
+    background: linear-gradient(135deg, #7fd3ff, #b7f0ff);
+    color: var(--board-ink, #2a2fb3);
+    text-align: left;
+    border-radius: 18px;
+    padding: 26px 32px 36px;
+    margin-top: 20px;
+    min-height: calc(100vh - 280px);
+    box-shadow: 0 18px 36px rgba(16, 33, 74, 0.16);
+}
+
+.hero-card {
+    --board-font-display: "League Spartan", "Manrope", "Segoe UI", Arial, sans-serif;
+    --board-font-body: "Manrope", "Segoe UI", Arial, sans-serif;
+    font-family: var(--board-font-body);
+}
+.hero-card.theme-men {
+    background:
+        radial-gradient(circle at 50% 32%, rgba(255,255,255,0.38), transparent 20%),
+        radial-gradient(circle at 8% 56%, rgba(255,255,255,0.14), transparent 24%),
+        radial-gradient(circle at 92% 70%, rgba(255,255,255,0.14), transparent 24%),
+        linear-gradient(90deg, #45c0e7 0%, #dcecf4 50%, #6ac8e5 100%);
+    --board-ink: #2a2fb3;
+    --board-bar: #2f9df4;
+    --board-bar-text: #ffffff;
+    --board-sep: rgba(255, 255, 255, 0.92);
+    --board-sep-soft: rgba(255, 255, 255, 0.58);
+}
+
+.hero-card.theme-women {
+    background:
+        radial-gradient(circle at 20% 20%, rgba(255,255,255,0.48), transparent 22%),
+        radial-gradient(circle at 78% 30%, rgba(255,255,255,0.34), transparent 20%),
+        radial-gradient(circle at 60% 80%, rgba(255,255,255,0.26), transparent 24%),
+        linear-gradient(135deg, #fef3f5, #f5dce9 48%, #f9eef3);
+    --board-ink: #8e1868;
+    --board-bar: #d7a7c5;
+    --board-bar-text: #8e1868;
+    --board-sep: rgba(255, 255, 255, 0.88);
+    --board-sep-soft: rgba(255, 255, 255, 0.58);
+}
+
+.hero-card.theme-pastoral {
+    background:
+        radial-gradient(circle at 20% 20%, rgba(255,255,255,0.48), transparent 22%),
+        radial-gradient(circle at 78% 30%, rgba(255,255,255,0.34), transparent 20%),
+        radial-gradient(circle at 60% 80%, rgba(255,255,255,0.22), transparent 24%),
+        linear-gradient(135deg, #fef3f5, #f5dce9 48%, #f9eef3);
+    --board-ink: #8e1868;
+    --board-bar: #d7a7c5;
+    --board-bar-text: #8e1868;
+    --board-sep: rgba(255, 255, 255, 0.88);
+    --board-sep-soft: rgba(255, 255, 255, 0.58);
+}
+
+.leaderboardTopBar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 14px;
+}
+
+.leaderboard-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.leader-tab {
+    border: 0;
+    border-radius: 999px;
+    padding: 10px 18px;
+    background: rgba(42, 47, 179, 0.12);
+    color: #2a2fb3;
+    font-weight: 700;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+
+.leader-tab.active {
+    background: #1976d2;
+    color: white;
+}
+
+.hero-card.theme-women .leader-tab,
+.hero-card.theme-women .fullscreenButton {
+    background: rgba(142, 24, 104, 0.12);
+    color: #8e1868;
+}
+
+.hero-card.theme-women .leader-tab.active {
+    background: #c46aa6;
+    color: #fff;
+}
+
+.hero-card.theme-pastoral .leader-tab,
+.hero-card.theme-pastoral .fullscreenButton {
+    background: rgba(142, 24, 104, 0.12);
+    color: #8e1868;
+}
+
+.hero-card.theme-pastoral .leader-tab.active {
+    background: #c46aa6;
+    color: #fff;
+}
+
+.fullscreenButton {
+    border: 0;
+    border-radius: 999px;
+    padding: 10px 18px;
+    background: rgba(42, 47, 179, 0.18);
+    color: #2a2fb3;
+    font-weight: 700;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+
+.statusMessage {
+    margin: 18px 0 0;
+    color: var(--board-ink, #2a2fb3);
+    font-weight: 700;
+    text-align: right;
+    font-size: 14px;
+}
+
+.statusMessage.isError {
+    color: #8b1e1e;
+}
+
+.leader-section {
+    display: none;
+    position: relative;
+    padding: 0;
+}
+
+.leader-section.active {
+    display: block;
+}
+
+.men,
+.women,
+.pastoral {
+    background: transparent;
+    border-radius: 14px;
+    padding: 24px;
+}
+
+.sectionHeader {
+    width: min(1520px, 100%);
+    margin: 0 auto 26px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    align-items: start;
+    gap: 30px;
+}
+
+.sectionHeader h2 {
+    font-family: var(--board-font-display);
+    font-size: clamp(2.1rem, 4.6vw, 4.4rem);
+    font-weight: 900;
+    margin: 0;
+    line-height: 0.92;
+    letter-spacing: -0.02em;
+    color: var(--board-ink, #2a2fb3);
+    text-transform: uppercase;
+}
+
+.topRightLabel {
+    position: static;
+    padding-top: 54px;
+    text-align: center;
+    font-family: var(--board-font-display);
+    font-weight: 900;
+    color: var(--board-ink, #2a2fb3);
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    font-size: clamp(1.15rem, 1.9vw, 2rem);
+    line-height: 1;
+}
+
+.topRightLabel strong {
+    display: block;
+}
+
+body.leaderboard-page .board {
+    width: min(1520px, 100%);
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+}
+
+body.leaderboard-page .row {
+    /* Arrow rows (desktop/tablet) */
+    --row-h: 88px;
+    --arrow: 28px;
+    --rank-w: 130px;
+    /* Keep attendees a bit shorter */
+    --att-w: clamp(280px, 30vw, 420px);
+    /* Independent seams so we can keep a small gap between rank→name,
+       while keeping name→attendees tighter. */
+    /* Small visible separation between rank + name */
+    --seam-name: 4px;
+    --seam-att: -8px;
+    --overlap-name: calc(var(--arrow) - var(--seam-name));
+    --overlap-att: calc(var(--arrow) - var(--seam-att));
+    display: grid;
+    grid-template-columns: var(--rank-w) minmax(0, 1fr) var(--att-w);
+    gap: 0;
+    align-items: stretch;
+    height: var(--row-h);
+    width: 100%;
+    filter: drop-shadow(0 12px 18px rgba(20, 66, 120, 0.12));
+}
+
+body.leaderboard-page .row.top {
+    /* #1 bigger */
+    --row-h: 94px;
+    --arrow: 32px;
+    --rank-w: 150px;
+    --att-w: clamp(300px, 32vw, 440px);
+    --seam-name: 6px;
+    --seam-att: -10px;
+    --overlap-name: calc(var(--arrow) - var(--seam-name));
+    --overlap-att: calc(var(--arrow) - var(--seam-att));
+}
+
+body.leaderboard-page .rankBox,
+body.leaderboard-page .nameBox,
+body.leaderboard-page .attBox {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0%, rgba(0, 0, 0, 0.07) 100%),
+        var(--board-bar);
+    color: var(--board-bar-text);
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: var(--row-h);
+    width: 100%;
+    text-transform: uppercase;
+    font-family: var(--board-font-display);
+    transform: translateZ(0);
+}
+
+body.leaderboard-page .rankBox {
+    justify-content: center;
+    font-weight: 900;
+    padding: 0;
+    clip-path: polygon(0 0, calc(100% - var(--arrow)) 0, 100% 50%, calc(100% - var(--arrow)) 100%, 0 100%);
+    z-index: 3;
+}
+
+body.leaderboard-page .rankNum,
+body.leaderboard-page .nameBox > *,
+body.leaderboard-page .attBox > * {
+    position: relative;
+}
+
+body.leaderboard-page .rankNum {
+    position: relative;
+    font-size: clamp(2.2rem, 2.6vw, 2.7rem);
+    line-height: 1;
+}
+
+body.leaderboard-page .nameBox {
+    min-width: 0;
+    overflow: hidden;
+    /* Overlap the previous arrow to remove the big gap (and hide anti-alias seams). */
+    margin-left: calc(-1 * var(--overlap-name) - 1px);
+    padding: 0 calc(var(--arrow) + 28px) 0 calc(var(--arrow) + 16px);
+    letter-spacing: -0.01em;
+    /* left notch + points right */
+    clip-path: polygon(0 0, calc(100% - var(--arrow)) 0, 100% 50%, calc(100% - var(--arrow)) 100%, 0 100%, var(--arrow) 50%);
+    z-index: 2;
+}
+
+body.leaderboard-page .avatar {
+    width: 70px;
+    height: 70px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.94);
+    color: var(--board-ink, #2a2fb3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-family: var(--board-font-display);
+    margin: 0 18px 0 0;
+    flex: 0 0 auto;
+    box-shadow: 0 10px 16px rgba(0, 0, 0, 0.12);
+}
+
+body.leaderboard-page .avatar.hasPhoto {
+    padding: 0;
+    overflow: visible;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+body.leaderboard-page .avatar.hasPhoto img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    filter: drop-shadow(0 10px 16px rgba(0, 0, 0, 0.18));
+}
+
+body.leaderboard-page .leaderMeta {
+    min-width: 0;
+}
+
+body.leaderboard-page .leaderName {
+    font-size: clamp(1.7rem, 2.7vw, 2.6rem);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+body.leaderboard-page .attBox {
+    justify-content: flex-start;
+    margin-left: calc(-1 * var(--overlap-att) - 1px);
+    padding: 0 calc(var(--arrow) + 22px) 0 calc(var(--arrow) + 10px);
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    font-size: clamp(1.55rem, 2.25vw, 2.15rem);
+    width: 100%;
+    /* left notch + points right */
+    clip-path: polygon(0 0, calc(100% - var(--arrow)) 0, 100% 50%, calc(100% - var(--arrow)) 100%, 0 100%, var(--arrow) 50%);
+    z-index: 1;
+}
+
+body.leaderboard-page .attText {
+    white-space: nowrap;
+}
+
+body.leaderboard-page .row.top .rankBox {
+    filter: brightness(1.05);
+}
+
+body.leaderboard-page .row.top .rankNum {
+    font-size: clamp(2.7rem, 3.3vw, 3.35rem);
+}
+
+body.leaderboard-page .row.top .avatar {
+    width: 76px;
+    height: 76px;
+}
+
+body.leaderboard-page .row.top .leaderName {
+    font-size: clamp(1.85rem, 2.85vw, 2.75rem);
+}
+
+body.leaderboard-page .row.top .attBox {
+    font-size: clamp(1.6rem, 2.3vw, 2.25rem);
+}
+
+:fullscreen body {
+    background:
+        radial-gradient(circle at 12% 18%, rgba(201, 75, 255, 0.22), transparent 24%),
+        radial-gradient(circle at 84% 12%, rgba(74, 160, 255, 0.22), transparent 26%),
+        linear-gradient(135deg, #2a0046 0%, #1a005f 46%, #001f8f 100%);
+}
+
+:fullscreen header,
+:fullscreen footer {
+    display: none;
+}
+
+:fullscreen main {
+    padding: 12px 18px 32px;
+}
+
+:fullscreen .hero-card {
+    margin-top: 0;
+    min-height: 100vh;
+    padding-top: 22px;
+}
+
+.emptyState {
+    margin: 0;
+    padding: 22px 24px;
+    border-radius: 18px;
+    color: #2a2fb3;
+    background: rgba(255,255,255,0.55);
+    font-weight: 700;
+    max-width: 520px;
+}
+
+.footer-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 20px;
+    text-align: left;
+}
+
+.footer-section {
+    width: 30%;
+}
+
+.footer-section h3 {
+    margin-bottom: 10px;
+    font-size: 18px;
+}
+
+.footer-section p, .footer-section a {
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.footer-logo {
+    height: 80px;
+    border-radius: 50%;
+}
+
+.social-icons img {
+    width: 25px;
+    margin-right: 10px;
+}
+
+body.leaderboard-page main {
+    padding: 16px 22px 26px;
+}
+
+body.leaderboard-page .hero-card {
+    max-width: 1460px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@media (max-width: 1320px) {
+    body.leaderboard-page .row {
+        --rank-w: 128px;
+        --att-w: 420px;
+        --row-h: 78px;
+        --arrow: 24px;
+    }
+
+    body.leaderboard-page .row.top {
+        --row-h: 84px;
+        --arrow: 28px;
+        --rank-w: 145px;
+        --att-w: 450px;
+    }
+
+    body.leaderboard-page .avatar {
+        width: 60px;
+        height: 60px;
+        margin-right: 16px;
+    }
+
+    body.leaderboard-page .row.top .avatar {
+        width: 66px;
+        height: 66px;
+    }
+
+    body.leaderboard-page .leaderName {
+        font-size: clamp(1.5rem, 3vw, 2.2rem);
+    }
+
+    body.leaderboard-page .attBox {
+        font-size: clamp(1.35rem, 2.4vw, 1.9rem);
+    }
+}
+
+@media (max-width: 980px) {
+    body.leaderboard-page .sectionHeader {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    body.leaderboard-page .topRightLabel {
+        padding-top: 0;
+        text-align: left;
+    }
+
+    body.leaderboard-page .row {
+        --rank-w: 116px;
+        --att-w: 340px;
+        --row-h: 74px;
+        --arrow: 22px;
+    }
+
+    body.leaderboard-page .row.top {
+        --row-h: 80px;
+        --arrow: 26px;
+    }
+}
+
+@media (max-width: 780px) {
+    body.leaderboard-page main {
+        padding: 12px 14px 18px;
+    }
+
+    body.leaderboard-page .topRightLabel {
+        display: none;
+    }
+}
+
+@media (max-width: 600px) {
+    body.leaderboard-page .row {
+        --row-h: 46px;
+        --arrow: 18px;
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-auto-rows: var(--row-h);
+        gap: 4px;
+        height: auto;
+        filter: none;
+    }
+
+    body.leaderboard-page .rankBox,
+    body.leaderboard-page .nameBox,
+    body.leaderboard-page .attBox {
+        width: 100%;
+        margin-left: 0;
+        border-radius: 12px;
+        filter: drop-shadow(0 10px 16px rgba(16, 33, 74, 0.14));
+    }
+
+    body.leaderboard-page .row.top {
+        --row-h: 50px;
+        --arrow: 20px;
+    }
+
+    body.leaderboard-page .rankBox {
+        justify-content: flex-start;
+        padding: 0 calc(var(--arrow) + 14px) 0 18px;
+        clip-path: polygon(0 0, calc(100% - var(--arrow)) 0, 100% 50%, calc(100% - var(--arrow)) 100%, 0 100%);
+    }
+
+    body.leaderboard-page .nameBox {
+        padding: 0 calc(var(--arrow) + 16px) 0 calc(var(--arrow) + 10px);
+        /* left notch + right arrow (no left arrow point) */
+        clip-path: polygon(0 0, calc(100% - var(--arrow)) 0, 100% 50%, calc(100% - var(--arrow)) 100%, 0 100%, var(--arrow) 50%);
+    }
+
+    body.leaderboard-page .attBox {
+        justify-content: flex-start;
+        padding: 0 calc(var(--arrow) + 16px) 0 calc(var(--arrow) + 16px);
+        /* left notch + right arrow (no left arrow point) */
+        clip-path: polygon(0 0, calc(100% - var(--arrow)) 0, 100% 50%, calc(100% - var(--arrow)) 100%, 0 100%, var(--arrow) 50%);
+    }
+
+    body.leaderboard-page .avatar {
+        width: 40px;
+        height: 40px;
+        margin: 0 12px 0 0;
+    }
+
+    body.leaderboard-page .row.top .avatar {
+        width: 44px;
+        height: 44px;
+    }
+
+    body.leaderboard-page .rankNum {
+        font-size: 1.7rem;
+    }
+
+    body.leaderboard-page .row.top .rankNum {
+        font-size: 1.9rem;
+    }
+
+    body.leaderboard-page .leaderName {
+        font-size: 1.05rem;
+    }
+
+    body.leaderboard-page .row.top .leaderName {
+        font-size: 1.1rem;
+    }
+
+    body.leaderboard-page .attBox {
+        font-size: 1.02rem;
+    }
+
+    body.leaderboard-page .row.top .attBox {
+        font-size: 1.05rem;
+    }
+
+    body.leaderboard-page .leaderName,
+    body.leaderboard-page .attText {
+        white-space: normal;
+    }
+}

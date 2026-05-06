@@ -1,0 +1,12 @@
+{
+  "admins": [
+    {
+      "email": "Juliusalas10@gmail.com",
+      "passwordHash": "Juliusalas123"
+    }
+  ],
+  "announcements": {
+    "pdf": "announcements.pdf",
+    "pptx": "announcements.pptx"
+  }
+}

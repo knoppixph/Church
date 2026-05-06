@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JCIOTRIM | Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@700;800;900&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="church.css">
+</head>
+<body class="admin-page">
+    <header class="site-header">
+        <div class="shell masthead">
+            <img src="CHURCH_LOGO.png" alt="Church Logo" class="logo-badge">
+            <div class="brand-block">
+                <p class="brand-slogan">
+                    <span class="brand-slogan-top">Jesus Christ</span>
+                    <span class="brand-slogan-bottom">Is Our True Religion International Ministry</span>
+                </p>
+            </div>
+            <img src="g12_logo.jpg" alt="G12 Logo" class="logo-badge">
+        </div>
+        <nav class="shell main-nav" aria-label="Primary">
+            <ul>
+                <li><a href="church_HOME.html">Home</a></li>
+                <li><a href="announcement.html">Announcements</a></li>
+                <li><a href="leaderboard.html">Leaderboard</a></li>
+                <li><a href="admin.html">Admin</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="shell page-content">
+        <section class="page-hero">
+            <p class="eyebrow">Admin</p>
+            <h2>Manage announcements files</h2>
+            <p class="lede">Sign in, then upload the latest PDF/PPTX. Files are saved on the server and replace the public downloads instantly.</p>
+            <p class="doc-note" id="sheetStatus" aria-live="polite">Backend ready. Waiting for login…</p>
+        </section>
+
+        <section class="doc-section" id="authSection">
+            <div class="card">
+                <h3>Admin sign-in</h3>
+                <form id="loginForm" class="login-form">
+                    <label>Email<br><input type="email" id="email" autocomplete="username" required></label>
+                    <label>Password<br><input type="password" id="password" autocomplete="current-password" required></label>
+                    <button type="submit" class="button primary">Sign in</button>
+                    <p class="doc-note" id="loginStatus" aria-live="polite"></p>
+                </form>
+            </div>
+        </section>
+
+        <section class="doc-section" id="adminSection" hidden>
+            <div class="cta-group">
+                <a class="button primary" href="announcements.pdf" download id="pdfLink">Download current PDF</a>
+                <a class="button ghost" href="announcements.pptx" download id="pptxLink">Download current PPTX</a>
+            </div>
+
+            <article class="card admin-note">
+                <h3>How to update</h3>
+                <ol class="admin-steps">
+                    <li>Select a new PDF or PPTX below (one or both). Filenames are forced to <strong>announcements.pdf</strong> and <strong>announcements.pptx</strong> automatically.</li>
+                    <li>Click <strong>Upload</strong>. Successful uploads replace the public downloads immediately.</li>
+                    <li>Open <a href="announcement.html">announcement.html</a> to confirm the preview; add <code>?v=1</code> if the browser caches the old file.</li>
+                </ol>
+            </article>
+
+            <article class="card">
+                <h3>Upload announcements</h3>
+                <form id="uploadForm" class="login-form" enctype="multipart/form-data">
+                    <label>PDF file (optional)<br><input type="file" id="pdfFile" name="pdf" accept="application/pdf"></label>
+                    <label>PPTX file (optional)<br><input type="file" id="pptxFile" name="pptx" accept=".pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/vnd.ms-powerpoint"></label>
+                    <button type="submit" class="button primary">Upload</button>
+                    <p class="doc-note" id="uploadStatus" aria-live="polite"></p>
+                </form>
+            </article>
+
+            <article class="card">
+                <h3>Remove current files</h3>
+                <div class="cta-group">
+                    <button type="button" class="button ghost" id="removePdf">Remove PDF</button>
+                    <button type="button" class="button ghost" id="removePptx">Remove PPTX</button>
+                </div>
+                <p class="doc-note" id="removeStatus" aria-live="polite"></p>
+            </article>
+
+            <div class="doc-frame-wrap">
+                <object class="doc-frame" data="announcements.pdf" type="application/pdf" id="pdfFrame">
+                    <p>Preview unavailable. <a href="announcements.pdf">Open the PDF</a>.</p>
+                </object>
+            </div>
+            <p class="doc-note">If the preview doesn't refresh, clear the browser cache or append <code>?v=1</code> to the URL.</p>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="shell footer-grid">
+            <div class="footer-brand">
+                <img src="CHURCH_LOGO.png" alt="Church Logo" class="footer-logo">
+                <p>Follow us on Facebook:</p>
+                <a href="https://www.facebook.com/jciotrim">facebook.com/jciotrim</a>
+            </div>
+            <div>
+                <h4>Visit</h4>
+                <p>#009 Doon St. Maysan Valenzuela City, Valenzuela, Philippines</p>
+            </div>
+            <div>
+                <h4>Contact</h4>
+                <p>Email: <a href="mailto:jciotrim@gmail.com">jciotrim@gmail.com</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+      const API_BASE = "";
+
+      const sheetStatus = document.getElementById("sheetStatus");
+      const loginStatus = document.getElementById("loginStatus");
+      const uploadStatus = document.getElementById("uploadStatus");
+      const removeStatus = document.getElementById("removeStatus");
+      const authSection = document.getElementById("authSection");
+      const adminSection = document.getElementById("adminSection");
+      const pdfLink = document.getElementById("pdfLink");
+      const pptxLink = document.getElementById("pptxLink");
+      const pdfFrame = document.getElementById("pdfFrame");
+      const pdfName = document.getElementById("pdfName");
+      const pptxName = document.getElementById("pptxName");
+
+      function setStatus(el, msg, isError = false) {
+        if (!el) return;
+        el.textContent = msg;
+        el.style.color = isError ? "#f29b9b" : "";
+      }
+
+      function markFilePresence(status) {
+        const hasPdf = status.files?.includes("pdf");
+        const hasPptx = status.files?.includes("pptx");
+        pdfLink.style.opacity = hasPdf ? "1" : "0.5";
+        pptxLink.style.opacity = hasPptx ? "1" : "0.5";
+        pdfLink.style.pointerEvents = hasPdf ? "auto" : "none";
+        pptxLink.style.pointerEvents = hasPptx ? "auto" : "none";
+        pdfFrame.data = hasPdf ? pdfLink.href : "";
+        pdfName.textContent = hasPdf ? "announcements.pdf" : "PDF not uploaded";
+        pptxName.textContent = hasPptx ? "announcements.pptx" : "PPTX not uploaded";
+      }
+
+      function token() {
+        return localStorage.getItem("adminToken") || "";
+      }
+
+      function saveToken(value) {
+        if (value) localStorage.setItem("adminToken", value);
+      }
+
+      async function api(path, opts = {}) {
+        const headers = opts.headers || {};
+        if (token()) headers["Authorization"] = `Bearer ${token()}`;
+        const res = await fetch(API_BASE + path, { ...opts, headers });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          if (res.status === 401) {
+            localStorage.removeItem("adminToken");
+            throw new Error("Please sign in to continue.");
+          }
+          const msg = data?.error || res.statusText;
+          throw new Error(msg);
+        }
+        return data;
+      }
+
+      function showAuthed(email) {
+        authSection.hidden = true;
+        adminSection.hidden = false;
+        setStatus(sheetStatus, `Signed in as ${email}`);
+      }
+
+      async function handleLogin(event) {
+        event.preventDefault();
+        setStatus(loginStatus, "Checking...");
+        try {
+          const email = document.getElementById("email").value.trim();
+          const password = document.getElementById("password").value;
+          const data = await api("/api/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password })
+          });
+          saveToken(data.token);
+          showAuthed(data.email || email);
+          setStatus(loginStatus, "Welcome, admin.");
+        } catch (err) {
+          setStatus(loginStatus, err.message, true);
+        }
+      }
+
+      async function handleUpload(event) {
+        event.preventDefault();
+        const pdfFile = document.getElementById("pdfFile").files[0];
+        const pptxFile = document.getElementById("pptxFile").files[0];
+        if (!pdfFile && !pptxFile) {
+          setStatus(uploadStatus, "Choose a PDF or PPTX first.", true);
+          return;
+        }
+        setStatus(uploadStatus, "Uploading...");
+        try {
+          const fd = new FormData();
+          if (pdfFile) fd.append("pdf", pdfFile);
+          if (pptxFile) fd.append("pptx", pptxFile);
+          await api("/api/upload-announcement", { method: "POST", body: fd });
+          setStatus(uploadStatus, "Uploaded. Reload announcement page to see the new files.");
+          // bump cache
+          pdfLink.href = `announcements.pdf?v=${Date.now()}`;
+          pptxLink.href = `announcements.pptx?v=${Date.now()}`;
+          pdfFrame.data = pdfLink.href;
+          await refreshStatus();
+        } catch (err) {
+          setStatus(uploadStatus, err.message, true);
+        }
+      }
+
+      async function handleRemove(kind) {
+        setStatus(removeStatus, `Removing ${kind.toUpperCase()}...`);
+        try {
+          await api("/api/delete-announcement", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ kind })
+          });
+          setStatus(removeStatus, `${kind.toUpperCase()} removed.`);
+          const bust = Date.now();
+          if (kind === "pdf") {
+            pdfLink.href = `announcements.pdf?v=${bust}`;
+            pdfFrame.data = pdfLink.href;
+          } else {
+            pptxLink.href = `announcements.pptx?v=${bust}`;
+          }
+          await refreshStatus();
+        } catch (err) {
+          setStatus(removeStatus, err.message, true);
+        }
+      }
+
+      async function refreshStatus() {
+        try {
+          const status = await api("/api/status");
+          markFilePresence(status);
+        } catch (err) {
+          console.warn("Status check failed:", err);
+        }
+      }
+
+      async function tryAutoLogin() {
+        if (!token()) return;
+        try {
+          const data = await api("/api/me");
+          showAuthed(data.email || "admin");
+        } catch {
+          localStorage.removeItem("adminToken");
+        }
+      }
+
+      document.getElementById("loginForm").addEventListener("submit", handleLogin);
+      document.getElementById("uploadForm").addEventListener("submit", handleUpload);
+      document.getElementById("removePdf").addEventListener("click", () => handleRemove("pdf"));
+      document.getElementById("removePptx").addEventListener("click", () => handleRemove("pptx"));
+      tryAutoLogin();
+      refreshStatus();
+    </script>
+</body>
+</html>

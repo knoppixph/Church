@@ -1,0 +1,544 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Cell leadership achiever dashboard for men, women, and pastoral teams.">
+    <title>Church Leadership Board</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@700;800;900&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="church.css?v=20260506-6">
+</head>
+<body class="leaderboard-page">
+    <header class="site-header">
+        <div class="shell masthead">
+            <img src="CHURCH_LOGO.png" alt="Church Logo" class="logo-badge">
+            <div class="brand-block">
+                <p class="brand-slogan">
+                    <span class="brand-slogan-top">Jesus Christ</span>
+                    <span class="brand-slogan-bottom">Is Our True Religion International Ministry</span>
+                </p>
+            </div>
+            <img src="g12_logo.jpg" alt="G12 Logo" class="logo-badge">
+        </div>
+        <nav class="shell main-nav" aria-label="Primary">
+            <ul>
+                <li><a href="church_HOME.html">Home</a></li>
+                <li><a href="announcement.html">Announcements</a></li>
+                <li><a href="leaderboard.html">Leaderboard</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="leaderboardCanvas" class="hero-card theme-men">
+            <div class="leaderboardTopBar">
+                <div class="leaderboard-tabs" role="tablist" aria-label="Dashboard sections">
+                    <button class="leader-tab active" type="button" data-tab="men" role="tab" aria-selected="true" aria-controls="men" id="tab-men">Men</button>
+                    <button class="leader-tab" type="button" data-tab="women" role="tab" aria-selected="false" aria-controls="women" id="tab-women" tabindex="-1">Women</button>
+                    <button class="leader-tab" type="button" data-tab="pastoral" role="tab" aria-selected="false" aria-controls="pastoral" id="tab-pastoral" tabindex="-1">Pastoral</button>
+                </div>
+                <button id="fullscreenToggle" class="fullscreenButton" type="button">Fullscreen</button>
+            </div>
+
+            <section id="men" class="leader-section active men" role="tabpanel" aria-labelledby="tab-men">
+                <div class="sectionHeader">
+                    <div class="titleGroup">
+                        <h2 id="menTitle"></h2>
+                    </div>
+                    <div class="topRightLabel">
+                        <strong>Cell Member</strong>
+                        <strong>Attendees</strong>
+                    </div>
+                </div>
+                <div id="menList" class="board"></div>
+            </section>
+
+            <section id="women" class="leader-section women" role="tabpanel" aria-labelledby="tab-women" hidden>
+                <div class="sectionHeader">
+                    <div class="titleGroup">
+                        <h2 id="womenTitle"></h2>
+                    </div>
+                    <div class="topRightLabel">
+                        <strong>Cell Member</strong>
+                        <strong>Attendees</strong>
+                    </div>
+                </div>
+                <div id="womenList" class="board"></div>
+            </section>
+
+            <section id="pastoral" class="leader-section pastoral" role="tabpanel" aria-labelledby="tab-pastoral" hidden>
+                <div class="sectionHeader">
+                    <div class="titleGroup">
+                        <h2 id="pastoralTitle"></h2>
+                    </div>
+                    <div class="topRightLabel">
+                        <strong>Cell Member</strong>
+                        <strong>Attendees</strong>
+                    </div>
+                </div>
+                <div id="pastoralList" class="board"></div>
+            </section>
+
+            <p id="statusMessage" class="statusMessage" role="status" aria-live="polite">Loading attendance data...</p>
+        </section>
+    </main>
+
+    <footer class="site-shell">
+        <div class="footer-container">
+            <div class="footer-section">
+                <img src="CHURCH_LOGO.png" alt="Church Logo" class="footer-logo">
+                <p>Facebook: <a href="https://www.facebook.com/jciotrim">https://www.facebook.com/jciotrim</a></p>
+                <p>Address: #009 Doon St. Maysan Valenzuela City, Valenzuela, Philippines</p>
+                <p>Email: jciotrim@gmail.com</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    const sheetID = "1q1fRR6UB8OGFpy_JoeZm_f8pnI7NLH9yW5S-Phbnbj8";
+    const leaderAnchor = "ANDRO JOHN GILIEGO";
+    const refreshIntervalMs = 15000;
+    const refreshIntervalSeconds = Math.round(refreshIntervalMs / 1000);
+
+    const MONTH_CODES = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+
+    // Known recent tabs (from sheet nav)
+    const FALLBACK_TABS = [
+      "050526_APR",
+      "050526_PASTORAL_APR",
+      "040526_MARCH",
+      "040526_PASTORAL_MAR",
+      "032926_MARCH",
+      "032926_PASTORAL_MAR",
+      "032226_MARCH",
+      "032226_PASTORAL_MAR",
+      "031526_MARCH",
+      "031526_PASTORAL_MAR",
+      "TEMPLATE",
+      "TEMPLATE_PASTORAL"
+    ];
+
+    function mostRecentSunday(fromDate = new Date()) {
+      const date = new Date(fromDate);
+      date.setHours(0, 0, 0, 0);
+      date.setDate(date.getDate() - date.getDay());
+      return date;
+    }
+
+    function formatTabName(dateObj, pastoral = false) {
+      const dd = String(dateObj.getDate()).padStart(2, "0");
+      const mm = String(dateObj.getMonth() + 1).padStart(2, "0");
+      const yy = String(dateObj.getFullYear()).slice(-2);
+      const mon = MONTH_CODES[dateObj.getMonth()];
+      return pastoral ? `${dd}${mm}${yy}_PASTORAL_${mon}` : `${dd}${mm}${yy}_${mon}`;
+    }
+
+    function buildSheetNames(weeksBack = 6, weeksAhead = 1) {
+      const base = [];
+      const pastoral = [];
+      const seen = new Set();
+
+      const lastSunday = mostRecentSunday();
+
+      // future Sundays
+      for (let w = 0; w <= weeksAhead; w += 1) {
+        const d = new Date(lastSunday);
+        d.setDate(d.getDate() + (w * 7));
+        const n1 = formatTabName(d, false);
+        const n2 = formatTabName(d, true);
+        if (!seen.has(n1)) { base.push(n1); seen.add(n1); }
+        if (!seen.has(n2)) { pastoral.push(n2); seen.add(n2); }
+      }
+
+      // past Sundays
+      for (let w = 1; w <= weeksBack; w += 1) {
+        const d = new Date(lastSunday);
+        d.setDate(d.getDate() - (w * 7));
+        const n1 = formatTabName(d, false);
+        const n2 = formatTabName(d, true);
+        if (!seen.has(n1)) { base.push(n1); seen.add(n1); }
+        if (!seen.has(n2)) { pastoral.push(n2); seen.add(n2); }
+      }
+
+      // add manual fallbacks (latest first)
+      FALLBACK_TABS.forEach(name => {
+        if (!seen.has(name)) {
+          if (name.includes("PASTORAL")) {
+            pastoral.push(name);
+          } else {
+            base.push(name);
+          }
+          seen.add(name);
+        }
+      });
+
+      return { base, pastoral };
+    }
+
+    // Use the most recent Sunday first so the board rolls forward automatically.
+    const { base: autoMainTabs, pastoral: autoPastoralTabs } = buildSheetNames();
+    const sheetCandidates = autoMainTabs;
+    const pastoralSheetCandidates = autoPastoralTabs;
+
+    const statusMessage = document.getElementById("statusMessage");
+    const tabs = Array.from(document.querySelectorAll(".leader-tab"));
+    const sections = Array.from(document.querySelectorAll(".leader-section"));
+    const fullscreenToggle = document.getElementById("fullscreenToggle");
+    const leaderboardCanvas = document.getElementById("leaderboardCanvas");
+
+    function titleDateLabel() {
+      const sunday = mostRecentSunday();
+      const monthShort = new Intl.DateTimeFormat("en-US", { month: "short" }).format(sunday).replace(".", "").toUpperCase();
+      return `${monthShort}. ${sunday.getDate()}`.toUpperCase();
+    }
+
+    function normalizeSheetLabel() {
+      return titleDateLabel();
+    }
+
+    function updateTitles(loadedSheet = "") {
+      const dateLabel = normalizeSheetLabel(loadedSheet);
+      document.getElementById("menTitle").innerHTML =
+        `CELL LEADERSHIP ACHIEVER<br>TEAM OF 12 MEN (${dateLabel})`;
+      document.getElementById("womenTitle").innerHTML =
+        `CELL LEADERSHIP ACHIEVER<br>TEAM OF 12 WOMEN (${dateLabel})`;
+      document.getElementById("pastoralTitle").innerHTML =
+        `PASTORAL STAFF<br>(${dateLabel})`;
+    }
+
+    updateTitles();
+
+    fullscreenToggle.addEventListener("click", toggleFullscreen);
+    document.addEventListener("fullscreenchange", syncFullscreenButton);
+
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => switchTab(tab.dataset.tab));
+      tab.addEventListener("keydown", handleTabKeydown);
+    });
+
+    function syncFullscreenButton() {
+      fullscreenToggle.textContent = document.fullscreenElement ? "Exit Fullscreen" : "Fullscreen";
+    }
+
+    async function toggleFullscreen() {
+      if (document.fullscreenElement) {
+        await document.exitFullscreen();
+        return;
+      }
+
+      await document.documentElement.requestFullscreen();
+    }
+
+    function handleTabKeydown(event) {
+      const currentIndex = tabs.indexOf(event.currentTarget);
+      if (currentIndex === -1) {
+        return;
+      }
+
+      let nextIndex = currentIndex;
+      if (event.key === "ArrowRight") {
+        nextIndex = (currentIndex + 1) % tabs.length;
+      } else if (event.key === "ArrowLeft") {
+        nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+      } else if (event.key === "Home") {
+        nextIndex = 0;
+      } else if (event.key === "End") {
+        nextIndex = tabs.length - 1;
+      } else {
+        return;
+      }
+
+      event.preventDefault();
+      tabs[nextIndex].focus();
+      switchTab(tabs[nextIndex].dataset.tab);
+    }
+
+    function switchTab(name) {
+      leaderboardCanvas.classList.remove("theme-men", "theme-women", "theme-pastoral");
+      leaderboardCanvas.classList.add(`theme-${name}`);
+
+      tabs.forEach((tab) => {
+        const isActive = tab.dataset.tab === name;
+        tab.classList.toggle("active", isActive);
+        tab.setAttribute("aria-selected", String(isActive));
+        tab.tabIndex = isActive ? 0 : -1;
+      });
+
+      sections.forEach((section) => {
+        const isActive = section.id === name;
+        section.classList.toggle("active", isActive);
+        section.hidden = !isActive;
+      });
+    }
+
+    function updateStatus(message, isError = false) {
+      statusMessage.textContent = message;
+      statusMessage.classList.toggle("isError", isError);
+    }
+
+    function initials(name) {
+      let clean = String(name || "").trim().replace(/\s+/g, " ");
+      clean = clean.replace(/^(CELL LEADER|CELLLEADER)\s+/i, "");
+      clean = clean.replace(/^(PS\.|PST\.|PSTRA\.|PSTR\.)\s+/i, "");
+      clean = clean.replace(/^MA\.\s+/i, "");
+
+      const parts = clean.split(/\s+/).filter(Boolean);
+      if (!parts.length) return "--";
+      if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+      return (String(parts[0][0] || "") + String(parts[parts.length - 1][0] || "")).toUpperCase() || "--";
+    }
+
+    function firstNameLabel(rawName) {
+      let original = String(rawName || "").trim().replace(/\s+/g, " ");
+      if (!original) return "";
+      let upper = original.toUpperCase();
+
+      // Strip an existing "CELL LEADER" prefix if the sheet already includes it
+      if (upper.startsWith("CELL LEADER ")) {
+        original = original.slice("CELL LEADER".length).trim();
+        upper = original.toUpperCase();
+      } else if (upper.startsWith("CELLLEADER ")) {
+        original = original.slice("CELLLEADER".length).trim();
+        upper = original.toUpperCase();
+      }
+
+      // Pastoral prefixes (keep prefix + first name)
+      const pastoralPrefixes = ["PS.", "PST.", "PSTRA.", "PSTR."];
+      for (const prefix of pastoralPrefixes) {
+        if (upper.startsWith(prefix + " ")) {
+          const rest = original.slice(prefix.length).trim();
+          const token = rest.split(/\s+/).filter(Boolean)[0] || rest;
+          return `${prefix} ${token}`.toUpperCase();
+        }
+      }
+
+      // Remove "MA." when it's a prefix (common: "MA. RIZALIE ...")
+      const stripped = upper.startsWith("MA. ") ? original.slice(3).trim() : original;
+      return (stripped.split(/\s+/).filter(Boolean)[0] || stripped).toUpperCase();
+    }
+
+    function parseSheetResponse(text) {
+      const match = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]+)\);?$/);
+      if (!match) {
+        throw new Error("Unexpected response format from Google Sheets.");
+      }
+      return JSON.parse(match[1]);
+    }
+
+    function findLeaderRowIndex() { return 4; }
+    function detectPositions() { return null; }
+
+    function countMembers(rows, startRowIndex, colIndex) {
+      let count = 0;
+      for (let rowIndex = startRowIndex + 1; rowIndex < rows.length; rowIndex += 1) {
+        const value = rows[rowIndex]?.c?.[colIndex]?.v;
+        const text = value === null || value === undefined ? "" : String(value).trim();
+        if (text !== "" && text !== "0") {
+          count += 1;
+        }
+      }
+      return count;
+    }
+
+    function collectLeaders(rows, leaderRowIndex, startCol, endCol) {
+      const leaders = [];
+      const leaderRow = rows[leaderRowIndex];
+
+      for (let colIndex = startCol; colIndex <= endCol; colIndex += 1) {
+        const leader = leaderRow?.c?.[colIndex]?.v;
+        if (!leader) {
+          continue;
+        }
+
+        const total = countMembers(rows, leaderRowIndex, colIndex);
+        if (total > 0) {
+          leaders.push({ name: String(leader).trim(), total, order: colIndex });
+        }
+      }
+
+      return leaders.sort((left, right) => right.total - left.total || left.order - right.order);
+    }
+
+    function createRow(item, index, namePrefix = "") {
+      const row = document.createElement("article");
+      row.className = `row${index === 0 ? " top" : ""}`;
+
+      const rankBox = document.createElement("div");
+      rankBox.className = "rankBox";
+      const rankNum = document.createElement("span");
+      rankNum.className = "rankNum";
+      rankNum.textContent = String(index + 1);
+      rankBox.append(rankNum);
+
+      const nameBox = document.createElement("div");
+      nameBox.className = "nameBox";
+      const avatar = document.createElement("div");
+      avatar.className = "avatar";
+      avatar.setAttribute("aria-hidden", "true");
+      avatar.textContent = initials(item.name);
+      const leaderMeta = document.createElement("div");
+      leaderMeta.className = "leaderMeta";
+      const leaderName = document.createElement("div");
+      leaderName.className = "leaderName";
+      const displayName = firstNameLabel(item.name);
+      leaderName.textContent = namePrefix
+        ? `${namePrefix} ${displayName}`.toUpperCase()
+        : displayName;
+      leaderMeta.append(leaderName);
+      nameBox.append(avatar, leaderMeta);
+
+      const attBox = document.createElement("div");
+      attBox.className = "attBox";
+      const attText = document.createElement("div");
+      attText.className = "attText";
+      attText.textContent = `${item.total} ${item.total === 1 ? "ATTENDEE" : "ATTENDEES"}`;
+      attBox.append(attText);
+
+      row.append(rankBox, nameBox, attBox);
+      return row;
+    }
+
+    function render(id, data, namePrefix = "") {
+      const container = document.getElementById(id);
+      container.replaceChildren();
+
+      if (!data.length) {
+        const emptyState = document.createElement("p");
+        emptyState.className = "emptyState";
+        emptyState.textContent = "No attendance data is available for this section yet.";
+        container.appendChild(emptyState);
+        return;
+      }
+
+      data.forEach((item, index) => {
+        container.appendChild(createRow(item, index, namePrefix));
+      });
+    }
+
+    function fetchSheet(sheetName, opts = {}) {
+      const range = opts.range ? String(opts.range) : "";
+      const headers = Number.isFinite(opts.headers) ? String(opts.headers) : "";
+      return new Promise((resolve, reject) => {
+        const callbackName = `sheetCallback_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
+        const script = document.createElement("script");
+        const cleanup = () => {
+          delete window[callbackName];
+          script.remove();
+        };
+
+        window[callbackName] = (payload) => {
+          cleanup();
+          resolve(payload.table?.rows || []);
+        };
+
+        script.onerror = () => {
+          cleanup();
+          reject(new Error(`Unable to load sheet "${sheetName}".`));
+        };
+
+        const params = new URLSearchParams();
+        params.set("sheet", sheetName);
+        params.set("tqx", `responseHandler:${callbackName}`);
+        params.set("cachebuster", String(Date.now()));
+        if (range) params.set("range", range);
+        if (headers) params.set("headers", headers);
+
+        const url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?${params.toString()}`;
+        script.src = url;
+        document.head.appendChild(script);
+      });
+    }
+
+    let isLoading = false;
+
+    async function loadData() {
+      if (isLoading) {
+        return;
+      }
+
+      isLoading = true;
+      updateStatus("Refreshing attendance data...");
+
+      try {
+        let rows = [];
+        let mainSheet = "";
+
+        for (const candidate of sheetCandidates) {
+          try {
+            rows = await fetchSheet(candidate, { range: "B5:Z80", headers: 0 });
+            mainSheet = candidate;
+            break;
+          } catch (error) {
+            console.warn(`Unable to load sheet "${candidate}".`, error);
+          }
+        }
+
+        if (!rows.length) {
+          throw new Error(`No rows returned. Checked: ${sheetCandidates.slice(0,3).join(", ")}...`);
+        }
+
+        // Fixed layout (Attendance-Template.xlsx):
+        // - Men leaders: B5:M5
+        // - Women leaders: O5:Z5
+        // We fetch B5:Z80 so row index 0 is the leaders row.
+        // Columns in this returned range are 0-indexed from column B.
+        const leaderRowIndex = 0;
+        const menStart = 0;        // col B
+        const womenStart = 13;     // col O (B=0, ..., M=11, N=12, O=13)
+
+        render("menList", collectLeaders(rows, leaderRowIndex, menStart, menStart + 11), "CELL LEADER");
+        render("womenList", collectLeaders(rows, leaderRowIndex, womenStart, womenStart + 11), "CELL LEADER");
+
+        // Pastoral: try pastoral-specific tab (B5:F5 = 5 columns)
+        let pastoralSheet = "";
+        let pastoralRows = [];
+        for (const candidate of pastoralSheetCandidates) {
+          try {
+            pastoralRows = await fetchSheet(candidate, { range: "B5:F80", headers: 0 });
+            pastoralSheet = candidate;
+            break;
+          } catch (error) {
+            console.warn(`Unable to load pastoral sheet "${candidate}".`, error);
+          }
+        }
+
+        if (pastoralRows.length) {
+          render("pastoralList", collectLeaders(pastoralRows, 0, 0, 4), "");
+        } else {
+          render("pastoralList", [], "");
+        }
+
+        updateTitles(mainSheet);
+        const updatedAt = new Intl.DateTimeFormat("en-US", {
+          month: "short",
+          day: "numeric",
+          hour: "numeric",
+          minute: "2-digit"
+        }).format(new Date());
+        const pastoralNote = pastoralSheet ? ` + ${pastoralSheet}` : "";
+        updateStatus(`Updated ${updatedAt}; auto-refresh every ${refreshIntervalSeconds}s. Showing ${titleDateLabel()} from ${mainSheet}${pastoralNote ? ` (main)${pastoralNote} (pastoral)` : " sheet"}.`);
+      } catch (error) {
+        console.error(error);
+        render("menList", []);
+        render("womenList", []);
+        render("pastoralList", []);
+        updateStatus("Unable to load attendance data. Open this page through a browser with internet access.", true);
+      } finally {
+        isLoading = false;
+      }
+    }
+
+    loadData();
+    window.setInterval(loadData, refreshIntervalMs);
+    window.addEventListener("focus", loadData);
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) {
+        loadData();
+      }
+    });
+    </script>
+</body>
+</html>
+

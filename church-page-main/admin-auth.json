@@ -1,0 +1,20 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "email": "juliusalas10@gmail.com",
+      "pass_hash": "32889d6fa63782d6177a264090f122667402103b81145de6f10b4cb9879f1892",
+      "role": "Admin",
+      "created_at": "2026-04-07T16:07:26.252Z"
+    }
+  ],
+  "tokens": [
+    {
+      "token": "8f9e4f825e49f4bb74650acc20436271aa491cb9de0e324d6aa705cb87867e9a",
+      "user_id": 1,
+      "created_at": "2026-05-06T07:53:49.496Z",
+      "last_seen_at": "2026-05-06T07:53:49.496Z",
+      "expires_at": "2026-05-06T15:53:49.496Z"
+    }
+  ]
+}
