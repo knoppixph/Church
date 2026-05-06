@@ -21,7 +21,7 @@ import {
     serverTimestamp,
     setDoc
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
-import { firebaseConfig, FIRESTORE_PATHS } from "./firebase-config.js";
+import { EMAIL_INVITE_ENDPOINT, firebaseConfig, FIRESTORE_PATHS } from "./firebase-config.js";
 import {
     FALLBACK_PDF_URL,
     FALLBACK_PPTX_URL,
@@ -309,6 +309,26 @@ function makeInviteMailto(email) {
     return `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
+async function requestInviteEmail(email) {
+    if (!EMAIL_INVITE_ENDPOINT) return false;
+
+    const user = auth.currentUser;
+    if (!user) throw new Error("Please sign in again.");
+
+    const idToken = await user.getIdToken();
+    const adminUrl = `${window.location.origin}${window.location.pathname}`;
+    const payload = JSON.stringify({ idToken, email, adminUrl });
+
+    await fetch(EMAIL_INVITE_ENDPOINT, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: payload
+    });
+
+    return true;
+}
+
 async function handleApproveAdmin(event) {
     event.preventDefault();
     setStatus(inviteStatus, "Approving admin email...");
@@ -330,24 +350,25 @@ async function handleApproveAdmin(event) {
             invitedBy: auth.currentUser?.email || ""
         }, { merge: true });
 
+        const emailRequested = await requestInviteEmail(email);
         document.getElementById("approveAdminForm").reset();
-        renderInviteStatus(email);
+        renderInviteStatus(email, emailRequested);
         await refreshAdmins();
     } catch (err) {
         setStatus(inviteStatus, err.message, true);
     }
 }
 
-function renderInviteStatus(email) {
+function renderInviteStatus(email, emailRequested = false) {
     if (!inviteStatus) return;
     inviteStatus.textContent = "";
     inviteStatus.style.color = "";
 
     const text = document.createElement("span");
-    text.textContent = `${email} is approved. `;
+    text.textContent = emailRequested ? `${email} is approved. Invite email request sent. ` : `${email} is approved. `;
     const link = document.createElement("a");
     link.href = makeInviteMailto(email);
-    link.textContent = "Open email invite";
+    link.textContent = emailRequested ? "Open backup invite" : "Open email invite";
     inviteStatus.append(text, link);
 }
 

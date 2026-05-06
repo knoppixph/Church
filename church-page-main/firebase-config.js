@@ -14,3 +14,7 @@ export const FIRESTORE_PATHS = {
     site: "site",
     announcements: "announcements"
 };
+
+// Paste the Google Apps Script Web App URL here after deployment.
+// Leave blank to keep the safe mailto fallback.
+export const EMAIL_INVITE_ENDPOINT = "https://script.google.com/macros/s/AKfycbxCZSNZ9ndDLc09Z_xDgYUPIKJ0ULBImXmvNGnBwiVAcuEIPpJQVTVBZWo5PyARrGBv7g/exec";
