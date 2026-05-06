@@ -1,52 +1,33 @@
-<!-- Complete Firebase User Page Without Sign-In -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>User Page</title>
+    <title>Inventory - Users</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<h1>User Page</h1>
-<p>This version has NO login and allows ADMIN to add users properly.</p>
 
-<!-- User List -->
-<div id="userList"></div>
+<div class="main">
+    <h1>User List (Inventory System)</h1>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getDatabase, ref, onValue, push, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    <p>This page only displays users. No editing, deleting, or adding.</p>
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyCguysIlysXrxoUVzvxwIegkkzjWHxJ9_s",
-        authDomain: "something-951af.firebaseapp.com",
-        databaseURL: "https://something-951af-default-rtdb.firebaseio.com/",
-        projectId: "something-951af",
-        storageBucket: "something-951af.appspot.com",
-        messagingSenderId: "473657927594",
-        appId: "1:473657927594:web:c62149f5b6a77ae8182dd3"
-    };
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Department</th>
+                <th>Role</th>
+                <th>Items Borrowed</th>
+                <th>Balance</th>
+            </tr>
+        </thead>
+        <tbody id="userTable"></tbody>
+    </table>
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+</div>
 
-    // AUTO LOAD USERS
-    const userListDiv = document.getElementById("userList");
+<script type="module" src="user.js"></script>
 
-    const usersRef = ref(db, "users");
-    onValue(usersRef, (snapshot) => {
-        const data = snapshot.val();
-        userListDiv.innerHTML = "";
-
-        if (!data) {
-            userListDiv.innerHTML = "<p>No users found.</p>";
-            return;
-        }
-
-        Object.keys(data).forEach(id => {
-            const user = data[id];
-            userListDiv.innerHTML += `<p><b>${user.name}</b> - ${user.balance}</p>`;
-        });
-    });
-</script>
 </body>
 </html>
