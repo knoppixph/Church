@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -7,16 +7,18 @@
     <title>Church Leadership Board</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="church.css">
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@700;800;900&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="church.css?v=20260506-6">
 </head>
 <body class="leaderboard-page">
     <header class="site-header">
         <div class="shell masthead">
             <img src="CHURCH_LOGO.png" alt="Church Logo" class="logo-badge">
             <div class="brand-block">
-                <p class="eyebrow">Jesus Christ Is Our True Religion</p>
-                <h1>International Ministry</h1>
+                <p class="brand-slogan">
+                    <span class="brand-slogan-top">Jesus Christ</span>
+                    <span class="brand-slogan-bottom">Is Our True Religion International Ministry</span>
+                </p>
             </div>
             <img src="g12_logo.jpg" alt="G12 Logo" class="logo-badge">
         </div>
@@ -46,8 +48,8 @@
                         <h2 id="menTitle"></h2>
                     </div>
                     <div class="topRightLabel">
-                        <strong>Cell Members</strong>
-                        <strong>Attendee</strong>
+                        <strong>Cell Member</strong>
+                        <strong>Attendees</strong>
                     </div>
                 </div>
                 <div id="menList" class="board"></div>
@@ -59,8 +61,8 @@
                         <h2 id="womenTitle"></h2>
                     </div>
                     <div class="topRightLabel">
-                        <strong>Cell Members</strong>
-                        <strong>Attendee</strong>
+                        <strong>Cell Member</strong>
+                        <strong>Attendees</strong>
                     </div>
                 </div>
                 <div id="womenList" class="board"></div>
@@ -72,8 +74,8 @@
                         <h2 id="pastoralTitle"></h2>
                     </div>
                     <div class="topRightLabel">
-                        <strong>Cell Members</strong>
-                        <strong>Attendee</strong>
+                        <strong>Cell Member</strong>
+                        <strong>Attendees</strong>
                     </div>
                 </div>
                 <div id="pastoralList" class="board"></div>
@@ -95,9 +97,10 @@
     </footer>
 
     <script>
-    const sheetID = "1IO8w_oRrq5o55wsRxEPzLjzUBKEenKzZ";
+    const sheetID = "1q1fRR6UB8OGFpy_JoeZm_f8pnI7NLH9yW5S-Phbnbj8";
     const leaderAnchor = "ANDRO JOHN GILIEGO";
     const refreshIntervalMs = 15000;
+    const refreshIntervalSeconds = Math.round(refreshIntervalMs / 1000);
 
     const MONTH_CODES = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
 
@@ -109,11 +112,20 @@
       "040526_PASTORAL_MAR",
       "032926_MARCH",
       "032926_PASTORAL_MAR",
-      "032225_PASTORAL_MAR",
       "032226_MARCH",
-      "031525_PASTORAL_MAR",
-      "031526_MARCH"
+      "032226_PASTORAL_MAR",
+      "031526_MARCH",
+      "031526_PASTORAL_MAR",
+      "TEMPLATE",
+      "TEMPLATE_PASTORAL"
     ];
+
+    function mostRecentSunday(fromDate = new Date()) {
+      const date = new Date(fromDate);
+      date.setHours(0, 0, 0, 0);
+      date.setDate(date.getDate() - date.getDay());
+      return date;
+    }
 
     function formatTabName(dateObj, pastoral = false) {
       const dd = String(dateObj.getDate()).padStart(2, "0");
@@ -128,10 +140,7 @@
       const pastoral = [];
       const seen = new Set();
 
-      const today = new Date();
-      const todayDow = today.getDay(); // 0 Sunday
-      const lastSunday = new Date(today);
-      lastSunday.setDate(today.getDate() - todayDow); // start of current week (Sunday)
+      const lastSunday = mostRecentSunday();
 
       // future Sundays
       for (let w = 0; w <= weeksAhead; w += 1) {
@@ -168,12 +177,10 @@
       return { base, pastoral };
     }
 
-    // Lock to this week's tabs first, then fall back to auto/Sunday logic
-    const pinnedMainTab = "050526_APR";
-    const pinnedPastoralTab = "050526_PASTORAL_APR";
+    // Use the most recent Sunday first so the board rolls forward automatically.
     const { base: autoMainTabs, pastoral: autoPastoralTabs } = buildSheetNames();
-    const sheetCandidates = [pinnedMainTab, ...autoMainTabs.filter(t => t !== pinnedMainTab)];
-    const pastoralSheetCandidates = [pinnedPastoralTab, ...autoPastoralTabs.filter(t => t !== pinnedPastoralTab)];
+    const sheetCandidates = autoMainTabs;
+    const pastoralSheetCandidates = autoPastoralTabs;
 
     const statusMessage = document.getElementById("statusMessage");
     const tabs = Array.from(document.querySelectorAll(".leader-tab"));
@@ -181,17 +188,14 @@
     const fullscreenToggle = document.getElementById("fullscreenToggle");
     const leaderboardCanvas = document.getElementById("leaderboardCanvas");
 
-    const now = new Date();
-    const monthShort = new Intl.DateTimeFormat("en-US", { month: "short" }).format(now).replace(".", "").toUpperCase();
-    const formattedDate = `${monthShort}. ${now.getDate()}`;
-
     function titleDateLabel() {
-      return formattedDate.toUpperCase();
+      const sunday = mostRecentSunday();
+      const monthShort = new Intl.DateTimeFormat("en-US", { month: "short" }).format(sunday).replace(".", "").toUpperCase();
+      return `${monthShort}. ${sunday.getDate()}`.toUpperCase();
     }
 
-    function normalizeSheetLabel(name = "") {
-      if (!name) return titleDateLabel();
-      return name.replace(/_/g, " ");
+    function normalizeSheetLabel() {
+      return titleDateLabel();
     }
 
     function updateTitles(loadedSheet = "") {
@@ -201,7 +205,7 @@
       document.getElementById("womenTitle").innerHTML =
         `CELL LEADERSHIP ACHIEVER<br>TEAM OF 12 WOMEN (${dateLabel})`;
       document.getElementById("pastoralTitle").innerHTML =
-        `CELL LEADERSHIP ACHIEVER<br>PASTORAL (${dateLabel})`;
+        `PASTORAL STAFF<br>(${dateLabel})`;
     }
 
     updateTitles();
@@ -275,10 +279,44 @@
     }
 
     function initials(name) {
-      const parts = String(name || "").trim().split(/\s+/).filter(Boolean);
-      const first = parts[0]?.[0] || "";
-      const last = parts[parts.length - 1]?.[0] || "";
-      return (first + last).toUpperCase() || "--";
+      let clean = String(name || "").trim().replace(/\s+/g, " ");
+      clean = clean.replace(/^(CELL LEADER|CELLLEADER)\s+/i, "");
+      clean = clean.replace(/^(PS\.|PST\.|PSTRA\.|PSTR\.)\s+/i, "");
+      clean = clean.replace(/^MA\.\s+/i, "");
+
+      const parts = clean.split(/\s+/).filter(Boolean);
+      if (!parts.length) return "--";
+      if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+      return (String(parts[0][0] || "") + String(parts[parts.length - 1][0] || "")).toUpperCase() || "--";
+    }
+
+    function firstNameLabel(rawName) {
+      let original = String(rawName || "").trim().replace(/\s+/g, " ");
+      if (!original) return "";
+      let upper = original.toUpperCase();
+
+      // Strip an existing "CELL LEADER" prefix if the sheet already includes it
+      if (upper.startsWith("CELL LEADER ")) {
+        original = original.slice("CELL LEADER".length).trim();
+        upper = original.toUpperCase();
+      } else if (upper.startsWith("CELLLEADER ")) {
+        original = original.slice("CELLLEADER".length).trim();
+        upper = original.toUpperCase();
+      }
+
+      // Pastoral prefixes (keep prefix + first name)
+      const pastoralPrefixes = ["PS.", "PST.", "PSTRA.", "PSTR."];
+      for (const prefix of pastoralPrefixes) {
+        if (upper.startsWith(prefix + " ")) {
+          const rest = original.slice(prefix.length).trim();
+          const token = rest.split(/\s+/).filter(Boolean)[0] || rest;
+          return `${prefix} ${token}`.toUpperCase();
+        }
+      }
+
+      // Remove "MA." when it's a prefix (common: "MA. RIZALIE ...")
+      const stripped = upper.startsWith("MA. ") ? original.slice(3).trim() : original;
+      return (stripped.split(/\s+/).filter(Boolean)[0] || stripped).toUpperCase();
     }
 
     function parseSheetResponse(text) {
@@ -294,9 +332,10 @@
 
     function countMembers(rows, startRowIndex, colIndex) {
       let count = 0;
-      for (let rowIndex = startRowIndex + 1; rowIndex <= startRowIndex + 13; rowIndex += 1) {
+      for (let rowIndex = startRowIndex + 1; rowIndex < rows.length; rowIndex += 1) {
         const value = rows[rowIndex]?.c?.[colIndex]?.v;
-        if (value !== null && value !== undefined && String(value).trim() !== "") {
+        const text = value === null || value === undefined ? "" : String(value).trim();
+        if (text !== "" && text !== "0") {
           count += 1;
         }
       }
@@ -308,21 +347,21 @@
       const leaderRow = rows[leaderRowIndex];
 
       for (let colIndex = startCol; colIndex <= endCol; colIndex += 1) {
-        const leader = leaderRow.c?.[colIndex]?.v;
+        const leader = leaderRow?.c?.[colIndex]?.v;
         if (!leader) {
           continue;
         }
 
         const total = countMembers(rows, leaderRowIndex, colIndex);
         if (total > 0) {
-          leaders.push({ name: String(leader).trim(), total });
+          leaders.push({ name: String(leader).trim(), total, order: colIndex });
         }
       }
 
-      return leaders.sort((left, right) => right.total - left.total || left.name.localeCompare(right.name));
+      return leaders.sort((left, right) => right.total - left.total || left.order - right.order);
     }
 
-    function createRow(item, index) {
+    function createRow(item, index, namePrefix = "") {
       const row = document.createElement("article");
       row.className = `row${index === 0 ? " top" : ""}`;
 
@@ -343,7 +382,10 @@
       leaderMeta.className = "leaderMeta";
       const leaderName = document.createElement("div");
       leaderName.className = "leaderName";
-      leaderName.textContent = `CELL LEADER ${item.name}`.toUpperCase();
+      const displayName = firstNameLabel(item.name);
+      leaderName.textContent = namePrefix
+        ? `${namePrefix} ${displayName}`.toUpperCase()
+        : displayName;
       leaderMeta.append(leaderName);
       nameBox.append(avatar, leaderMeta);
 
@@ -358,7 +400,7 @@
       return row;
     }
 
-    function render(id, data) {
+    function render(id, data, namePrefix = "") {
       const container = document.getElementById(id);
       container.replaceChildren();
 
@@ -371,11 +413,13 @@
       }
 
       data.forEach((item, index) => {
-        container.appendChild(createRow(item, index));
+        container.appendChild(createRow(item, index, namePrefix));
       });
     }
 
-    function fetchSheet(sheetName) {
+    function fetchSheet(sheetName, opts = {}) {
+      const range = opts.range ? String(opts.range) : "";
+      const headers = Number.isFinite(opts.headers) ? String(opts.headers) : "";
       return new Promise((resolve, reject) => {
         const callbackName = `sheetCallback_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
         const script = document.createElement("script");
@@ -394,7 +438,14 @@
           reject(new Error(`Unable to load sheet "${sheetName}".`));
         };
 
-        const url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?sheet=${encodeURIComponent(sheetName)}&tqx=responseHandler:${callbackName}&cachebuster=${Date.now()}`;
+        const params = new URLSearchParams();
+        params.set("sheet", sheetName);
+        params.set("tqx", `responseHandler:${callbackName}`);
+        params.set("cachebuster", String(Date.now()));
+        if (range) params.set("range", range);
+        if (headers) params.set("headers", headers);
+
+        const url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?${params.toString()}`;
         script.src = url;
         document.head.appendChild(script);
       });
@@ -412,12 +463,12 @@
 
       try {
         let rows = [];
-        let loadedSheet = "";
+        let mainSheet = "";
 
         for (const candidate of sheetCandidates) {
           try {
-            rows = await fetchSheet(candidate);
-            loadedSheet = candidate;
+            rows = await fetchSheet(candidate, { range: "B5:Z80", headers: 0 });
+            mainSheet = candidate;
             break;
           } catch (error) {
             console.warn(`Unable to load sheet "${candidate}".`, error);
@@ -428,42 +479,46 @@
           throw new Error(`No rows returned. Checked: ${sheetCandidates.slice(0,3).join(", ")}...`);
         }
 
-        // Fixed layout per sheet: leaders on row 5 (1-based), men B-K, women L-U
-        const leaderRowIndex = 4; // zero-based for row 5
-        const menStart = 1;       // col B
-        const womenStart = 12;    // col M
+        // Fixed layout (Attendance-Template.xlsx):
+        // - Men leaders: B5:M5
+        // - Women leaders: O5:Z5
+        // We fetch B5:Z80 so row index 0 is the leaders row.
+        // Columns in this returned range are 0-indexed from column B.
+        const leaderRowIndex = 0;
+        const menStart = 0;        // col B
+        const womenStart = 13;     // col O (B=0, ..., M=11, N=12, O=13)
 
-        render("menList", collectLeaders(rows, leaderRowIndex, menStart, menStart + 9));   // 10 cols
-        render("womenList", collectLeaders(rows, leaderRowIndex, womenStart, womenStart + 9)); // 10 cols
+        render("menList", collectLeaders(rows, leaderRowIndex, menStart, menStart + 11), "CELL LEADER");
+        render("womenList", collectLeaders(rows, leaderRowIndex, womenStart, womenStart + 11), "CELL LEADER");
 
-        // Try pastoral-specific tab first; fall back to current rows if needed
-        try {
-          let pastoralRows = rows;
-          for (const candidate of pastoralSheetCandidates) {
-            try {
-              pastoralRows = await fetchSheet(candidate);
-              loadedSheet = candidate;
-              break;
-            } catch (error) {
-              console.warn(`Unable to load pastoral sheet "${candidate}".`, error);
-            }
+        // Pastoral: try pastoral-specific tab (B5:F5 = 5 columns)
+        let pastoralSheet = "";
+        let pastoralRows = [];
+        for (const candidate of pastoralSheetCandidates) {
+          try {
+            pastoralRows = await fetchSheet(candidate, { range: "B5:F80", headers: 0 });
+            pastoralSheet = candidate;
+            break;
+          } catch (error) {
+            console.warn(`Unable to load pastoral sheet "${candidate}".`, error);
           }
-          const pastoralLeaderRowIndex = 4; // row 5
-          const pStart = 1; // col B
-          render("pastoralList", collectLeaders(pastoralRows, pastoralLeaderRowIndex, pStart, pStart + 9));
-        } catch (err) {
-          console.warn("Pastoral tab fallback used.", err);
-          render("pastoralList", collectLeaders(rows, leaderRowIndex, womenStart + 10, womenStart + 11));
         }
 
-        updateTitles(loadedSheet);
+        if (pastoralRows.length) {
+          render("pastoralList", collectLeaders(pastoralRows, 0, 0, 4), "");
+        } else {
+          render("pastoralList", [], "");
+        }
+
+        updateTitles(mainSheet);
         const updatedAt = new Intl.DateTimeFormat("en-US", {
           month: "short",
           day: "numeric",
           hour: "numeric",
           minute: "2-digit"
         }).format(new Date());
-        updateStatus(`Updated ${updatedAt} from the ${loadedSheet} sheet.`);
+        const pastoralNote = pastoralSheet ? ` + ${pastoralSheet}` : "";
+        updateStatus(`Updated ${updatedAt}; auto-refresh every ${refreshIntervalSeconds}s. Showing ${titleDateLabel()} from ${mainSheet}${pastoralNote ? ` (main)${pastoralNote} (pastoral)` : " sheet"}.`);
       } catch (error) {
         console.error(error);
         render("menList", []);
@@ -477,6 +532,13 @@
 
     loadData();
     window.setInterval(loadData, refreshIntervalMs);
+    window.addEventListener("focus", loadData);
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) {
+        loadData();
+      }
+    });
     </script>
 </body>
 </html>
+

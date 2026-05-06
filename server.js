@@ -18,7 +18,21 @@ const ANNOUNCEMENT_PDF = path.join(SITE_DIR, "announcements.pdf");
 const ANNOUNCEMENT_PPTX = path.join(SITE_DIR, "announcements.pptx");
 
 // Static site
-app.use(express.static(SITE_DIR));
+// Disable caching so CSS/HTML changes show up immediately during local editing.
+app.use(
+  express.static(SITE_DIR, {
+    etag: false,
+    lastModified: false,
+    setHeaders: (res, filePath) => {
+      const lower = String(filePath || "").toLowerCase();
+      if (lower.endsWith(".html") || lower.endsWith(".css") || lower.endsWith(".js")) {
+        res.setHeader("Cache-Control", "no-store, max-age=0, must-revalidate");
+        res.setHeader("Pragma", "no-cache");
+        res.setHeader("Expires", "0");
+      }
+    },
+  })
+);
 app.use(express.json({ limit: "1mb" }));
 
 // Simple JSON auth store (to avoid native sqlite binding)
