@@ -2,6 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/fireba
 import {
     EmailAuthProvider,
     createUserWithEmailAndPassword,
+    deleteUser,
     getAuth,
     onAuthStateChanged,
     reauthenticateWithCredential,
@@ -12,14 +13,17 @@ import {
     updatePassword
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 import {
+    Timestamp,
     collection,
+    deleteField,
     deleteDoc,
     doc,
     getDoc,
     getDocs,
     getFirestore,
     serverTimestamp,
-    setDoc
+    setDoc,
+    updateDoc
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 import { EMAIL_INVITE_ENDPOINT, firebaseConfig, FIRESTORE_PATHS } from "./firebase-config.js";
 import {
@@ -59,6 +63,8 @@ const pptxUrlInput = document.getElementById("pptxUrl");
 const previewWrap = document.getElementById("adminPreviewWrap");
 
 let activeAdmin = null;
+let inviteClaimInProgress = false;
+const inviteParams = getInviteParams();
 
 function setStatus(el, msg, isError = false) {
     if (!el) return;
@@ -68,6 +74,45 @@ function setStatus(el, msg, isError = false) {
 
 function strongPassword(value) {
     return /[a-z]/.test(value) && /[A-Z]/.test(value) && /\d/.test(value) && value.length >= 8;
+}
+
+function makeInviteToken() {
+    const bytes = new Uint8Array(32);
+    crypto.getRandomValues(bytes);
+    return btoa(String.fromCharCode(...bytes)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+}
+
+function getInviteParams() {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("invite") || "";
+    const email = params.get("email") || "";
+    if (!token || !email) return null;
+    return { token, email: emailKey(email) };
+}
+
+function makeInviteUrl(email, inviteToken) {
+    const url = new URL(window.location.href);
+    url.search = "";
+    url.hash = "";
+    url.searchParams.set("invite", inviteToken);
+    url.searchParams.set("email", emailKey(email));
+    return url.toString();
+}
+
+function prepareInviteView() {
+    if (!inviteParams) return;
+
+    const emailInput = document.getElementById("registerEmail");
+    if (emailInput) {
+        emailInput.value = inviteParams.email;
+        emailInput.readOnly = true;
+    }
+
+    setStatus(registerStatus, "One-time invite detected. Create your password to activate admin access.");
+    setTimeout(() => {
+        document.getElementById("registerForm")?.scrollIntoView({ behavior: "smooth", block: "center" });
+        document.getElementById("registerPassword")?.focus();
+    }, 100);
 }
 
 function setLinkState(anchor, url, enabledText, disabledText) {
@@ -203,6 +248,11 @@ async function handleCreateAccount(event) {
         return;
     }
 
+    if (inviteParams) {
+        await handleInviteAccountCreate(email, password);
+        return;
+    }
+
     try {
         const credential = await createUserWithEmailAndPassword(auth, email, password);
         await sendEmailVerification(credential.user);
@@ -212,6 +262,64 @@ async function handleCreateAccount(event) {
     } catch (err) {
         setStatus(registerStatus, err.message, true);
     }
+}
+
+async function handleInviteAccountCreate(email, password) {
+    if (emailKey(email) !== inviteParams.email) {
+        setStatus(registerStatus, "Use the same email address from the invite.", true);
+        return;
+    }
+
+    let credential = null;
+    inviteClaimInProgress = true;
+
+    try {
+        credential = await createUserWithEmailAndPassword(auth, email, password);
+        const adminData = await claimInviteAdmin(credential.user, email, inviteParams.token);
+        window.history.replaceState({}, "", "admin.html");
+        document.getElementById("registerForm").reset();
+        setStatus(registerStatus, "Admin account activated.");
+        await showAuthed(credential.user, adminData);
+    } catch (err) {
+        if (credential?.user) {
+            await deleteUser(credential.user).catch(() => {});
+            await signOut(auth).catch(() => {});
+        }
+
+        const alreadyUsed = err.code === "auth/email-already-in-use";
+        const message = alreadyUsed
+            ? "This invite was already used. Sign in with the password that was created for this email."
+            : "This invite link is invalid, expired, or already used.";
+        setStatus(registerStatus, message, true);
+    } finally {
+        inviteClaimInProgress = false;
+    }
+}
+
+async function claimInviteAdmin(user, email, inviteToken) {
+    const key = emailKey(email);
+    const adminRef = doc(db, FIRESTORE_PATHS.admins, user.uid);
+    const approvalRef = doc(db, FIRESTORE_PATHS.adminEmails, key);
+    const adminData = {
+        email: key,
+        emailKey: key,
+        role: "admin",
+        active: true,
+        inviteToken,
+        claimedAt: serverTimestamp(),
+        createdAt: serverTimestamp()
+    };
+
+    await setDoc(adminRef, adminData);
+    await updateDoc(adminRef, { inviteToken: deleteField() }).catch(() => {});
+    await updateDoc(approvalRef, {
+        active: false,
+        inviteToken: deleteField(),
+        inviteUsedAt: serverTimestamp(),
+        inviteUsedBy: user.uid
+    }).catch(() => {});
+
+    return { ...adminData, inviteToken: undefined };
 }
 
 async function handleSaveLinks(event) {
@@ -292,8 +400,8 @@ async function handleChangePassword(event) {
     }
 }
 
-function makeInviteMailto(email) {
-    const adminUrl = `${window.location.origin}${window.location.pathname}`;
+function makeInviteMailto(email, inviteToken) {
+    const adminUrl = makeInviteUrl(email, inviteToken);
     const subject = "JCIOTRIM admin access";
     const body = [
         "Hello,",
@@ -301,7 +409,7 @@ function makeInviteMailto(email) {
         "You have been approved as a JCIOTRIM technical admin.",
         "",
         `Open this page: ${adminUrl}`,
-        "Choose Create approved account, verify your email, then sign in.",
+        "This is a one-time invite link. Create your password to activate admin access.",
         "",
         "Keep your password private."
     ].join("\n");
@@ -309,15 +417,15 @@ function makeInviteMailto(email) {
     return `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
-async function requestInviteEmail(email) {
+async function requestInviteEmail(email, inviteToken) {
     if (!EMAIL_INVITE_ENDPOINT) return false;
 
     const user = auth.currentUser;
     if (!user) throw new Error("Please sign in again.");
 
     const idToken = await user.getIdToken();
-    const adminUrl = `${window.location.origin}${window.location.pathname}`;
-    const payload = JSON.stringify({ idToken, email, adminUrl });
+    const inviteUrl = makeInviteUrl(email, inviteToken);
+    const payload = JSON.stringify({ idToken, email, adminUrl: inviteUrl, inviteUrl, inviteToken });
 
     await fetch(EMAIL_INVITE_ENDPOINT, {
         method: "POST",
@@ -341,34 +449,48 @@ async function handleApproveAdmin(event) {
 
     try {
         const key = emailKey(email);
+        const inviteToken = makeInviteToken();
+        const inviteExpiresAt = Timestamp.fromDate(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000));
         await setDoc(doc(db, FIRESTORE_PATHS.adminEmails, key), {
             email,
             emailKey: key,
             role: "admin",
             active: true,
+            inviteToken,
+            inviteExpiresAt,
+            inviteUsedAt: null,
             createdAt: serverTimestamp(),
             invitedBy: auth.currentUser?.email || ""
         }, { merge: true });
 
-        const emailRequested = await requestInviteEmail(email);
+        let emailRequested = false;
+        let emailError = "";
+        try {
+            emailRequested = await requestInviteEmail(email, inviteToken);
+        } catch (err) {
+            emailError = err.message || "Automatic email failed.";
+        }
+
         document.getElementById("approveAdminForm").reset();
-        renderInviteStatus(email, emailRequested);
+        renderInviteStatus(email, emailRequested, inviteToken, emailError);
         await refreshAdmins();
     } catch (err) {
         setStatus(inviteStatus, err.message, true);
     }
 }
 
-function renderInviteStatus(email, emailRequested = false) {
+function renderInviteStatus(email, emailRequested = false, inviteToken = "", emailError = "") {
     if (!inviteStatus) return;
     inviteStatus.textContent = "";
     inviteStatus.style.color = "";
 
     const text = document.createElement("span");
-    text.textContent = emailRequested ? `${email} is approved. Invite email request sent. ` : `${email} is approved. `;
+    text.textContent = emailRequested
+        ? `${email} is approved. One-time invite email request sent. `
+        : `${email} is approved. ${emailError ? "Automatic email did not send. " : ""}`;
     const link = document.createElement("a");
-    link.href = makeInviteMailto(email);
-    link.textContent = emailRequested ? "Open backup invite" : "Open email invite";
+    link.href = makeInviteMailto(email, inviteToken);
+    link.textContent = emailRequested ? "Open backup one-time invite" : "Open one-time invite";
     inviteStatus.append(text, link);
 }
 
@@ -453,8 +575,18 @@ async function handleAdminListClick(event) {
 }
 
 onAuthStateChanged(auth, async (user) => {
+    if (inviteClaimInProgress) return;
+
     if (!user) {
         showSignedOut();
+        prepareInviteView();
+        return;
+    }
+
+    if (inviteParams && emailKey(user.email) !== inviteParams.email) {
+        await signOut(auth);
+        showSignedOut();
+        prepareInviteView();
         return;
     }
 

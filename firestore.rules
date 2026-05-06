@@ -17,10 +17,17 @@ service cloud.firestore {
         && request.auth.token.email_verified == true;
     }
 
-    function approvedEmail(emailKey) {
+    function emailMatchesApproval(emailKey) {
       return exists(/databases/$(database)/documents/adminEmails/$(emailKey))
-        && get(/databases/$(database)/documents/adminEmails/$(emailKey)).data.active == true
         && get(/databases/$(database)/documents/adminEmails/$(emailKey)).data.email == request.auth.token.email;
+    }
+
+    function hasActiveInvite(emailKey) {
+      return emailMatchesApproval(emailKey)
+        && get(/databases/$(database)/documents/adminEmails/$(emailKey)).data.active == true
+        && get(/databases/$(database)/documents/adminEmails/$(emailKey)).data.inviteUsedAt == null
+        && get(/databases/$(database)/documents/adminEmails/$(emailKey)).data.inviteToken == request.resource.data.inviteToken
+        && get(/databases/$(database)/documents/adminEmails/$(emailKey)).data.inviteExpiresAt > request.time;
     }
 
     match /site/announcements {
@@ -32,12 +39,13 @@ service cloud.firestore {
       allow get: if isAdmin() || (signedIn() && request.auth.uid == uid);
       allow list: if isAdmin();
       allow create: if request.auth.uid == uid
-        && signedInWithVerifiedEmail()
+        && signedIn()
         && request.resource.data.email == request.auth.token.email
         && request.resource.data.active == true
         && request.resource.data.role == "admin"
         && request.resource.data.emailKey is string
-        && approvedEmail(request.resource.data.emailKey);
+        && request.resource.data.inviteToken is string
+        && hasActiveInvite(request.resource.data.emailKey);
       allow update, delete: if isAdmin();
     }
 

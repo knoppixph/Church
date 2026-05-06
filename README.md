@@ -51,7 +51,7 @@ The Firebase web config in `church-page-main/firebase-config.js` is public confi
 
 ## Optional Gmail Invite Emails
 
-For professional Gmail invite emails without exposing a Gmail app password, use Google Apps Script:
+For professional one-time Gmail invite emails without exposing a Gmail app password, use Google Apps Script:
 
 1. Create a new Apps Script project at `https://script.google.com`.
 2. Paste `apps-script/admin-invite.gs` into `Code.gs`.
@@ -62,4 +62,4 @@ For professional Gmail invite emails without exposing a Gmail app password, use 
 7. Paste that URL into `EMAIL_INVITE_ENDPOINT` in `church-page-main/firebase-config.js`.
 8. Commit, push, and run `firebase deploy`.
 
-The web app still checks the Firebase ID token and Firestore admin record before sending email.
+The web app still checks the Firebase ID token and Firestore admin record before sending email. Invite links are one-time setup links: the recipient creates their own password, gets signed in, and the invite record is consumed.

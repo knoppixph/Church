@@ -86,7 +86,7 @@ function buildInviteText_(email, adminUrl, invitedBy) {
     "Open this page:",
     adminUrl,
     "",
-    "Choose Create approved account, verify your email, then sign in.",
+    "This is a one-time setup link. Create your password to activate admin access.",
     "",
     "Invited by: " + invitedBy,
     "",
@@ -117,7 +117,7 @@ function buildInviteHtml_(email, adminUrl, invitedBy) {
               <td style="padding:34px;">
                 <p style="margin:0 0 18px;font-size:16px;line-height:1.6;">Hello,</p>
                 <p style="margin:0 0 18px;font-size:16px;line-height:1.6;">You have been approved as a <strong>JCIOTRIM technical admin</strong>.</p>
-                <p style="margin:0 0 24px;font-size:16px;line-height:1.6;">Use the button below to open the admin page. Create your approved account, verify your email, then sign in.</p>
+                <p style="margin:0 0 24px;font-size:16px;line-height:1.6;">Use the button below to open your one-time setup link. Create your password to activate admin access.</p>
                 <p style="margin:0 0 26px;text-align:center;">
                   <a href="${safeUrl}" style="display:inline-block;background:#7e3cff;color:#ffffff;text-decoration:none;font-weight:700;padding:14px 22px;border-radius:10px;">Go to JCIOTRIM Admin</a>
                 </p>
@@ -129,7 +129,7 @@ function buildInviteHtml_(email, adminUrl, invitedBy) {
                     </td>
                   </tr>
                 </table>
-                <p style="margin:24px 0 0;font-size:13px;line-height:1.6;color:#64748b;">Keep your password private. If you did not expect this invitation, you can ignore this email.</p>
+                <p style="margin:24px 0 0;font-size:13px;line-height:1.6;color:#64748b;">This link can only be used once. Keep your password private. If you did not expect this invitation, you can ignore this email.</p>
               </td>
             </tr>
           </table>
