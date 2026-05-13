@@ -17,9 +17,9 @@
 body {
     font-family: 'Manrope', 'Segoe UI', Arial, sans-serif;
     background:
-        radial-gradient(circle at 12% 18%, rgba(201, 75, 255, 0.22), transparent 24%),
-        radial-gradient(circle at 84% 12%, rgba(74, 160, 255, 0.22), transparent 26%),
-        linear-gradient(135deg, #2a0046 0%, #1a005f 46%, #001f8f 100%);
+        radial-gradient(circle at 12% 16%, rgba(201, 75, 255, 0.14), transparent 24%),
+        radial-gradient(circle at 86% 12%, rgba(74, 160, 255, 0.14), transparent 26%),
+        linear-gradient(135deg, #21003a 0%, #15035d 48%, #06167a 100%);
     color: var(--text);
     margin: 0;
     padding: 0;
@@ -152,13 +152,13 @@ img {
 }
 
 .shell {
-    max-width: 1200px;
+    max-width: 1280px;
     margin: 0 auto;
     padding: 0 24px;
 }
 
 .site-header {
-    background: linear-gradient(90deg, rgba(33, 4, 58, 0.92), rgba(7, 11, 68, 0.95));
+    background: linear-gradient(90deg, rgba(27, 3, 49, 0.94), rgba(8, 10, 58, 0.96));
     border-bottom: 1px solid var(--stroke);
     box-shadow: 0 18px 32px rgba(0, 0, 0, 0.22);
     position: sticky;
@@ -171,18 +171,18 @@ img {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 18px;
-    padding: 18px 0;
+    gap: 28px;
+    padding: 18px 0 14px;
     flex-wrap: wrap;
 }
 
 .logo-badge {
-    height: 86px;
-    width: 86px;
-    border-radius: 18px;
+    height: 72px;
+    width: 72px;
+    border-radius: 16px;
     object-fit: cover;
     background: #0b1222;
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
+    box-shadow: 0 12px 26px rgba(0, 0, 0, 0.28);
 }
 
 .brand-block {
@@ -199,27 +199,32 @@ img {
     margin: 0;
     text-transform: uppercase;
     text-align: center;
-    width: 100%;
+    width: min(100%, 760px);
+    padding: 12px 24px 11px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 10px;
+    background: rgba(10, 3, 45, 0.24);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .brand-slogan-top {
     display: block;
     font-family: "League Spartan", "Manrope", "Segoe UI", Arial, sans-serif;
-    font-size: clamp(2.1rem, 6.2vw, 4.4rem);
+    font-size: clamp(2rem, 5vw, 4rem);
     letter-spacing: 0;
     font-weight: 900;
-    line-height: 0.78;
+    line-height: 0.86;
     color: var(--text);
 }
 
 .brand-slogan-bottom {
     display: block;
-    margin-top: 14px;
+    margin-top: 8px;
     font-family: "League Spartan", "Manrope", "Segoe UI", Arial, sans-serif;
-    font-size: clamp(0.68rem, 2vw, 1.35rem);
+    font-size: clamp(0.7rem, 1.55vw, 1.1rem);
     letter-spacing: 0;
     font-weight: 900;
-    line-height: 0.95;
+    line-height: 1.05;
     color: var(--text);
     white-space: nowrap;
 }
@@ -250,8 +255,8 @@ img {
 .main-nav ul {
     list-style: none;
     display: flex;
-    gap: 12px;
-    padding: 12px 0 18px;
+    gap: 8px;
+    padding: 10px 0 16px;
     margin: 0;
     overflow-x: auto;
     scrollbar-width: thin;
@@ -261,9 +266,9 @@ img {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 10px 14px;
+    padding: 9px 14px;
     color: var(--text);
-    border-radius: 12px;
+    border-radius: 999px;
     transition: all 150ms ease;
     white-space: nowrap;
 }
@@ -277,45 +282,51 @@ body.home-page .main-nav a[href*="church_HOME"],
 body.announcement-page .main-nav a[href*="announcement"],
 body.leaderboard-page .main-nav a[href*="leaderboard"],
 body.admin-page .main-nav a[href*="admin"] {
-    background: rgba(240, 180, 41, 0.14);
-    color: var(--primary-strong);
-    box-shadow: inset 0 0 0 1px rgba(240, 180, 41, 0.28);
+    background: rgba(255, 255, 255, 0.10);
+    color: var(--text);
+    box-shadow: inset 0 0 0 1px rgba(201, 75, 255, 0.28);
 }
 
 .page-content {
-    padding: 32px 0 48px;
+    padding: 28px 0 48px;
 }
 
 .page-hero {
-    background: linear-gradient(110deg, #3a046d 0%, #3713b5 50%, #0a32ff 100%);
+    background:
+        linear-gradient(110deg, rgba(58, 4, 109, 0.92) 0%, rgba(55, 19, 181, 0.88) 52%, rgba(10, 50, 255, 0.86) 100%);
     border: 1px solid var(--stroke);
-    border-radius: 18px;
-    padding: 32px;
-    box-shadow: 0 18px 36px rgba(0, 0, 0, 0.22);
+    border-radius: 14px;
+    padding: clamp(24px, 4vw, 42px);
+    box-shadow: 0 20px 42px rgba(0, 0, 0, 0.24);
     text-align: left;
     overflow: hidden;
 }
 
 .doc-section {
-    margin: 26px 0 32px;
+    margin: 22px 0 32px;
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 20px;
-    padding: 22px 22px 26px;
-    box-shadow: 0 22px 44px rgba(0, 0, 0, 0.30);
+    border-radius: 16px;
+    padding: clamp(18px, 2.5vw, 28px);
+    box-shadow: 0 20px 42px rgba(0, 0, 0, 0.28);
 }
 
 .home-page .page-hero {
     display: grid;
     gap: 8px;
-    min-height: 360px;
+    min-height: 320px;
     align-content: center;
+}
+
+.announcement-page .page-hero,
+.admin-page .page-hero {
+    min-height: 240px;
 }
 
 .doc-frame-wrap {
     margin-top: 14px;
     border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 18px;
+    border-radius: 14px;
     overflow: hidden;
     box-shadow: 0 18px 36px rgba(0, 0, 0, 0.34);
     background: linear-gradient(135deg, rgba(255,255,255,0.09), rgba(255,255,255,0.04));
@@ -324,7 +335,7 @@ body.admin-page .main-nav a[href*="admin"] {
 .doc-frame {
     width: 100%;
     height: min(1200px, 78vh);
-    min-height: 520px;
+    min-height: 560px;
     border: 0;
     display: block;
     background: #101018;
@@ -455,15 +466,15 @@ body.admin-page .main-nav a[href*="admin"] {
 }
 
 .page-hero h2 {
-    margin: 8px 0 10px;
-    font-size: clamp(2rem, 5vw, 3.7rem);
+    margin: 8px 0 12px;
+    font-size: clamp(2rem, 4.4vw, 3.45rem);
     letter-spacing: 0;
     line-height: 1.02;
 }
 
 .lede {
     color: var(--muted);
-    max-width: 720px;
+    max-width: 660px;
     margin: 0 0 18px;
 }
 
@@ -479,7 +490,7 @@ body.admin-page .main-nav a[href*="admin"] {
     align-items: center;
     justify-content: center;
     padding: 12px 16px;
-    border-radius: 12px;
+    border-radius: 999px;
     font-weight: 700;
     border: 1px solid transparent;
     transition: transform 140ms ease, box-shadow 140ms ease, background 140ms ease;
@@ -519,7 +530,7 @@ body.admin-page .main-nav a[href*="admin"] {
 .card {
     background: linear-gradient(135deg, rgba(34, 9, 68, 0.92), rgba(17, 7, 54, 0.9));
     border: 1px solid var(--stroke);
-    border-radius: 16px;
+    border-radius: 14px;
     padding: 18px;
     box-shadow: 0 14px 28px rgba(0, 0, 0, 0.2);
     text-align: left;
@@ -618,7 +629,7 @@ body.admin-page .main-nav a[href*="admin"] {
     .masthead {
         justify-content: center;
         gap: 12px;
-        padding: 14px 0;
+        padding: 14px 0 12px;
     }
 
     .logo-badge {
@@ -630,6 +641,10 @@ body.admin-page .main-nav a[href*="admin"] {
     .brand-block {
         order: 3;
         flex-basis: 100%;
+    }
+
+    .brand-slogan {
+        padding: 12px 14px 10px;
     }
 
     .brand-slogan-top {
@@ -664,7 +679,12 @@ body.admin-page .main-nav a[href*="admin"] {
     }
 
     .home-page .page-hero {
-        min-height: 300px;
+        min-height: 280px;
+    }
+
+    .announcement-page .page-hero,
+    .admin-page .page-hero {
+        min-height: auto;
     }
 
     .cta-group,
