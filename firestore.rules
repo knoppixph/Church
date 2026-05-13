@@ -35,6 +35,32 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    match /contactRequests/{requestId} {
+      allow create: if request.resource.data.keys().hasOnly([
+          "name",
+          "contact",
+          "message",
+          "consent",
+          "status",
+          "page",
+          "createdAt"
+        ])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() >= 1
+        && request.resource.data.name.size() <= 80
+        && request.resource.data.contact is string
+        && request.resource.data.contact.size() >= 1
+        && request.resource.data.contact.size() <= 120
+        && request.resource.data.message is string
+        && request.resource.data.message.size() >= 1
+        && request.resource.data.message.size() <= 1000
+        && request.resource.data.consent == true
+        && request.resource.data.status == "new"
+        && request.resource.data.page == "home"
+        && request.resource.data.createdAt == request.time;
+      allow read, update, delete: if isAdmin();
+    }
+
     match /admins/{uid} {
       allow get: if isAdmin() || (signedIn() && request.auth.uid == uid);
       allow list: if isAdmin();

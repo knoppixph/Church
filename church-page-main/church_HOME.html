@@ -33,25 +33,7 @@
             <p class="loader-subtitle">Is Our True Religion</p>
         </div>
     </div>
-    <header class="site-header">
-        <div class="shell masthead">
-            <img src="CHURCH_LOGO.png" alt="Church Logo" class="logo-badge">
-            <div class="brand-block">
-                <p class="brand-slogan">
-                    <span class="brand-slogan-top">Jesus Christ</span>
-                    <span class="brand-slogan-bottom">Is Our True Religion International Ministry</span>
-                </p>
-            </div>
-            <img src="g12_logo.jpg" alt="G12 Logo" class="logo-badge">
-        </div>
-        <nav class="shell main-nav" aria-label="Primary">
-            <ul>
-                <li><a href="church_HOME.html">Home</a></li>
-                <li><a href="announcement.html">Announcements</a></li>
-                <li><a href="leaderboard.html">Leaderboard</a></li>
-            </ul>
-        </nav>
-    </header>
+    <div data-site-header></div>
 
     <main class="shell page-content">
         <section class="page-hero">
@@ -67,7 +49,7 @@
         <section class="info-grid">
             <article class="card">
                 <h3>Gather</h3>
-                <p>Worship, pray, and celebrate milestones together—onsite or online.</p>
+                <p>Worship, pray, and celebrate milestones together - onsite or online.</p>
             </article>
             <article class="card">
                 <h3>Grow</h3>
@@ -78,25 +60,58 @@
                 <p>Serve the city and share the gospel through everyday moments.</p>
             </article>
         </section>
+
+        <section class="section-band home-details">
+            <div>
+                <p class="eyebrow">Weekly worship</p>
+                <h2>Service Schedule</h2>
+                <p class="lede">Join us for worship, discipleship, and fellowship at JCIOTRIM.</p>
+            </div>
+            <div class="info-grid">
+                <article class="card">
+                    <h3>Sunday Worship</h3>
+                    <p>Gather with the church family for worship, prayer, and the Word.</p>
+                </article>
+                <article class="card">
+                    <h3>Cell Groups</h3>
+                    <p>Grow through discipleship, care, and leadership development throughout the week.</p>
+                </article>
+                <article class="card">
+                    <h3>Visit Us</h3>
+                    <p><a href="https://maps.app.goo.gl/aEq7nhKFkA9rVEP46" target="_blank" rel="noopener noreferrer">#009 Doon St. Maysan Valenzuela City</a></p>
+                </article>
+            </div>
+        </section>
+
+        <section class="section-band latest-announcement" id="latestAnnouncement">
+            <p class="eyebrow">Latest announcement</p>
+            <h2>Stay updated</h2>
+            <p class="lede" id="latestAnnouncementText">Checking the latest published announcement...</p>
+            <div class="cta-group">
+                <a class="button primary" href="announcement.html">Open announcements</a>
+            </div>
+        </section>
+
+        <section class="section-band contact-section">
+            <div>
+                <p class="eyebrow">Prayer and contact</p>
+                <h2>Send a message</h2>
+                <p class="lede">Share a prayer request or contact note with the church team.</p>
+            </div>
+            <form id="prayerRequestForm" class="contact-form">
+                <label>Name<br><input type="text" id="contactName" autocomplete="name" maxlength="80" required></label>
+                <label>Contact info<br><input type="text" id="contactInfo" autocomplete="email" maxlength="120" required></label>
+                <label>Prayer request or message<br><textarea id="contactMessage" rows="5" maxlength="1000" required></textarea></label>
+                <label class="check-label"><input type="checkbox" id="contactConsent" required> I agree that JCIOTRIM may receive and respond to this message.</label>
+                <button type="submit" class="button primary">Send message</button>
+                <p class="doc-note" id="contactStatus" aria-live="polite"></p>
+            </form>
+        </section>
     </main>
 
-    <footer class="site-footer">
-        <div class="shell footer-grid">
-            <div class="footer-brand">
-                <img src="CHURCH_LOGO.png" alt="Church Logo" class="footer-logo">
-                <p>Follow us on Facebook:</p>
-                <a href="https://www.facebook.com/jciotrim">facebook.com/jciotrim</a>
-            </div>
-            <div>
-                <h4>Visit</h4>
-                <p><a class="map-link" href="https://maps.app.goo.gl/aEq7nhKFkA9rVEP46" target="_blank" rel="noopener noreferrer">#009 Doon St. Maysan Valenzuela City, Valenzuela, Philippines</a></p>
-            </div>
-            <div>
-                <h4>Contact</h4>
-                <p>Email: <a href="mailto:jciotrim@gmail.com">jciotrim@gmail.com</a></p>
-            </div>
-        </div>
-    </footer>
+    <div data-site-footer></div>
+    <script src="site-layout.js"></script>
     <script src="site-loader.js"></script>
+    <script type="module" src="firebase-home.js"></script>
 </body>
 </html>

@@ -18,6 +18,7 @@ const pdfLink = document.getElementById("announcementPdfLink");
 const pptxLink = document.getElementById("announcementPptxLink");
 const statusEl = document.getElementById("announcementStatus");
 const updatedEl = document.getElementById("announcementUpdatedAt");
+const emptyState = document.getElementById("announcementEmptyState");
 
 function setStatus(message, isError = false) {
     if (!statusEl) return;
@@ -40,6 +41,11 @@ function updateButton(anchor, url, enabledText, disabledText) {
     anchor.textContent = enabledText;
     anchor.removeAttribute("aria-disabled");
     anchor.classList.remove("is-disabled");
+}
+
+function setEmptyState(isEmpty) {
+    if (emptyState) emptyState.hidden = !isEmpty;
+    pdfFrame?.closest(".doc-frame-wrap")?.toggleAttribute("hidden", isEmpty);
 }
 
 async function loadAnnouncements() {
@@ -66,12 +72,14 @@ async function loadAnnouncements() {
 
         updateButton(pdfLink, pdfUrl, "Open PDF", "PDF not published");
         updateButton(pptxLink, pptxUrl, "Open PPTX", "PPTX not published");
+        setEmptyState(!pdfUrl && !pptxUrl);
 
         const updated = formatUpdatedAt(data.updatedAt);
         if (updatedEl) updatedEl.textContent = updated ? `Updated: ${updated}` : "";
-        setStatus(pdfUrl || pptxUrl ? "Announcements ready." : "No announcement links have been published yet.");
+        setStatus(pdfUrl || pptxUrl ? "Announcements ready." : "No announcement is currently published. Please check back soon.");
     } catch (err) {
         console.error(err);
+        setEmptyState(true);
         setStatus("Announcements could not load from Firebase.", true);
     } finally {
         window.hideLoader?.();

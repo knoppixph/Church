@@ -279,7 +279,8 @@ img {
 body.home-page .main-nav a[href*="church_HOME"],
 body.announcement-page .main-nav a[href*="announcement"],
 body.leaderboard-page .main-nav a[href*="leaderboard"],
-body.admin-page .main-nav a[href*="admin"] {
+body.admin-page .main-nav a[href*="admin"],
+.main-nav a[aria-current="page"] {
     background: rgba(255, 255, 255, 0.10);
     color: var(--text);
     box-shadow: inset 0 0 0 1px rgba(201, 75, 255, 0.28);
@@ -307,6 +308,91 @@ body.admin-page .main-nav a[href*="admin"] {
     border-radius: 16px;
     padding: clamp(18px, 2.5vw, 28px);
     box-shadow: 0 20px 42px rgba(0, 0, 0, 0.28);
+}
+
+.section-band {
+    margin-top: 26px;
+    padding: clamp(22px, 3vw, 34px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.035);
+    box-shadow: 0 18px 36px rgba(0, 0, 0, 0.22);
+}
+
+.section-band h2 {
+    margin: 8px 0 10px;
+    font-size: clamp(1.65rem, 3vw, 2.5rem);
+    line-height: 1.08;
+}
+
+.announcement-empty-state {
+    display: grid;
+    gap: 8px;
+    place-items: center;
+    min-height: 280px;
+    margin-top: 14px;
+    padding: 34px 22px;
+    text-align: center;
+    border: 1px dashed rgba(255, 255, 255, 0.18);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.045);
+}
+
+.announcement-empty-state[hidden] {
+    display: none;
+}
+
+.announcement-empty-state h3 {
+    margin: 0;
+    font-size: clamp(1.35rem, 2.5vw, 2rem);
+}
+
+.announcement-empty-state p {
+    max-width: 560px;
+    margin: 0;
+    color: var(--muted);
+}
+
+.doc-actions {
+    margin-top: 12px;
+}
+
+.contact-form {
+    display: grid;
+    gap: 13px;
+    max-width: 760px;
+}
+
+.contact-form label {
+    color: var(--muted);
+    font-weight: 700;
+}
+
+.contact-form input,
+.contact-form textarea {
+    width: 100%;
+    margin-top: 4px;
+    padding: 11px 12px;
+    border: 1px solid var(--stroke);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.045);
+    color: var(--text);
+    font: inherit;
+}
+
+.contact-form textarea {
+    resize: vertical;
+}
+
+.check-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.check-label input {
+    width: auto;
+    margin-top: 6px;
 }
 
 .home-page .page-hero {
@@ -597,6 +683,16 @@ body.admin-page .main-nav a[href*="admin"] {
 
 .footer-grid a {
     color: var(--text);
+}
+
+.footer-action {
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+}
+
+.copyright {
+    font-size: 0.9rem;
 }
 
 .footer-grid h4 {

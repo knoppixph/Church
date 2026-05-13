@@ -506,14 +506,30 @@ async function requestInviteEmail(email, inviteToken) {
     const inviteUrl = makeInviteUrl(email, inviteToken);
     const payload = JSON.stringify({ idToken, email, adminUrl: inviteUrl, inviteUrl, inviteToken });
 
-    await fetch(EMAIL_INVITE_ENDPOINT, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: payload
-    });
+    try {
+        const response = await fetch(EMAIL_INVITE_ENDPOINT, {
+            method: "POST",
+            mode: "cors",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: payload
+        });
 
-    return true;
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok || result.ok === false) {
+            throw new Error(result.error || "Invite email endpoint did not confirm delivery.");
+        }
+
+        return "confirmed";
+    } catch (error) {
+        console.warn("Readable invite email request failed; using compatibility fallback.", error);
+        await fetch(EMAIL_INVITE_ENDPOINT, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: payload
+        });
+        return "submitted";
+    }
 }
 
 async function handleApproveAdmin(event) {
@@ -544,16 +560,18 @@ async function handleApproveAdmin(event) {
         }, { merge: true });
 
         let emailRequested = false;
+        let emailRequestStatus = "";
         let emailError = "";
         try {
-            emailRequested = await requestInviteEmail(email, inviteToken);
+            emailRequestStatus = await requestInviteEmail(email, inviteToken);
+            emailRequested = !!emailRequestStatus;
         } catch (err) {
             emailError = err.message || "Automatic email failed.";
         }
 
         document.getElementById("approveAdminForm").reset();
-        renderInviteStatus(email, emailRequested, inviteToken, emailError);
-        showToast(emailRequested ? "Invite email request sent." : "Admin email approved.");
+        renderInviteStatus(email, emailRequested, inviteToken, emailError, emailRequestStatus);
+        showToast(emailRequestStatus === "confirmed" ? "Invite email confirmed." : emailRequested ? "Invite email submitted." : "Admin email approved.");
         await refreshAdmins();
     } catch (err) {
         setStatus(inviteStatus, err.message, true);
@@ -562,14 +580,16 @@ async function handleApproveAdmin(event) {
     }, event.submitter);
 }
 
-function renderInviteStatus(email, emailRequested = false, inviteToken = "", emailError = "") {
+function renderInviteStatus(email, emailRequested = false, inviteToken = "", emailError = "", emailRequestStatus = "") {
     if (!inviteStatus) return;
     inviteStatus.textContent = "";
     inviteStatus.style.color = "";
 
     const text = document.createElement("span");
-    text.textContent = emailRequested
-        ? `${email} is approved. One-time invite email request sent. `
+    text.textContent = emailRequestStatus === "confirmed"
+        ? `${email} is approved. One-time invite email confirmed. `
+        : emailRequested
+        ? `${email} is approved. One-time invite email submitted, but delivery could not be confirmed by the browser. `
         : `${email} is approved. ${emailError ? "Automatic email did not send. " : ""}`;
     const link = document.createElement("a");
     link.href = makeInviteMailto(email, inviteToken);
@@ -661,6 +681,30 @@ async function handleAdminListClick(event) {
     }, button);
 }
 
+async function handleCleanupExpiredInvites(event) {
+    setStatus(inviteStatus, "Checking expired invites...");
+
+    await runWithLoader(async () => {
+    try {
+        const approvedSnap = await getDocs(collection(db, FIRESTORE_PATHS.adminEmails));
+        const now = Date.now();
+        const expired = approvedSnap.docs.filter((approvalDoc) => {
+            const data = approvalDoc.data();
+            const expiresAt = data.inviteExpiresAt?.toDate?.();
+            return data.active === true && expiresAt && expiresAt.getTime() <= now;
+        });
+
+        await Promise.all(expired.map((approvalDoc) => deleteDoc(doc(db, FIRESTORE_PATHS.adminEmails, approvalDoc.id))));
+        setStatus(inviteStatus, expired.length ? `${expired.length} expired invite(s) removed.` : "No expired invites found.");
+        showToast(expired.length ? "Expired invites removed." : "No expired invites found.");
+        await refreshAdmins();
+    } catch (err) {
+        setStatus(inviteStatus, err.message, true);
+        showToast(err.message, "error");
+    }
+    }, event.currentTarget);
+}
+
 onAuthStateChanged(auth, async (user) => {
     if (inviteClaimInProgress) return;
 
@@ -697,4 +741,5 @@ document.getElementById("approveAdminForm").addEventListener("submit", handleApp
 document.getElementById("removePdf").addEventListener("click", () => handleClear("pdf"));
 document.getElementById("removePptx").addEventListener("click", () => handleClear("pptx"));
 document.getElementById("logoutButton").addEventListener("click", () => signOut(auth));
+document.getElementById("cleanupExpiredInvites")?.addEventListener("click", handleCleanupExpiredInvites);
 adminList?.addEventListener("click", handleAdminListClick);

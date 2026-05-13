@@ -1,0 +1,375 @@
+JCIOTRIM WEBSITE SYSTEM REVIEW AND IMPROVEMENT LIST
+Date: May 13, 2026
+
+Project:
+JCIOTRIM - Jesus Christ Is Our True Religion International Ministry
+
+Current system summary:
+- Public website is deployed on Firebase Hosting.
+- Public announcement links are read from Cloud Firestore.
+- Admin login uses Firebase Authentication.
+- Admin approval data is stored in Cloud Firestore.
+- Admin invite email uses Google Apps Script.
+- Leaderboard data is fetched from Google Sheets every 5 seconds.
+- Legacy local Node/Express server still exists for local fallback and older upload/admin workflows.
+
+Overall status:
+The main public website is working and the core Firebase/Google Sheets features are preserved. The strongest parts are the Firebase Hosting setup, Firestore-backed announcement links, admin-only management, and Google Sheets leaderboard refresh. The biggest improvement opportunities are security cleanup, easier announcement management, better admin audit/history, and code organization.
+
+
+HIGH PRIORITY IMPROVEMENTS
+
+1. Remove or isolate legacy hardcoded local admin credentials.
+File: server.js
+Why:
+The legacy local server still contains default admin email, username, and password values. Firebase Hosting does not use this server, but keeping default credentials in the repository is risky and confusing.
+Recommended action:
+Move legacy defaults into environment variables, remove hardcoded passwords, or clearly archive the local server as development-only.
+
+2. Fix broken text encoding on the home page.
+File: church-page-main/church_HOME.html
+Issue:
+The Gather card currently shows a broken dash/encoding character in the phrase about "onsite or online."
+Recommended action:
+Replace it with normal ASCII text: "together - onsite or online."
+
+3. Improve admin invite email result handling.
+File: church-page-main/firebase-admin.js
+Issue:
+The invite email request uses fetch with mode: "no-cors", so the browser cannot know if the Apps Script email actually succeeded or failed. The UI may say the request was sent even if the script rejected it.
+Recommended action:
+Use a CORS-enabled endpoint, Firebase Cloud Functions, or Apps Script response headers that allow the site to read success/error status.
+
+4. Add an announcement history/audit trail.
+Current behavior:
+The system stores only the current PDF/PPTX links in site/announcements.
+Why improve:
+Admins may need to know who changed links, when they changed them, and what the previous links were.
+Recommended action:
+Add a Firestore collection such as announcementHistory with fields:
+- pdfUrl
+- pptxUrl
+- updatedBy
+- updatedAt
+- action: saved, cleared_pdf, cleared_pptx
+
+5. Improve admin role management.
+Current behavior:
+Admins can approve emails and remove approved emails. Current admins are listed, but there is no polished disable/remove admin flow for existing admins.
+Recommended action:
+Add clear controls for:
+- disable admin
+- reactivate admin
+- show last login/created date
+- prevent an admin from removing their own access by mistake
+
+
+MEDIUM PRIORITY IMPROVEMENTS
+
+6. Replace placeholder announcement page text.
+File: church-page-main/announcement.html
+Current text:
+"Replace these placeholders with your weekly notes."
+Why:
+This feels unfinished on a live church site.
+Suggested text:
+"View the latest ministry announcements, service updates, and presentation resources."
+
+7. Add user-friendly admin guidance.
+File: church-page-main/admin.html
+Why:
+Admins may not know which Google Drive links to paste.
+Recommended action:
+Add concise helper text near the PDF/PPTX inputs:
+- Use Google Drive share links.
+- Set file access to "Anyone with the link can view."
+- Use PDF for preview and PPTX for download.
+
+8. Add validation for Google Drive links.
+Files:
+- church-page-main/firebase-admin.js
+- church-page-main/firebase-utils.js
+Current behavior:
+Any http/https URL is allowed.
+Recommended action:
+Warn admins when links are not Google Drive links, while still allowing external links if needed.
+
+9. Add cache/version consistency.
+Files:
+- church-page-main/leaderboard.html
+- other HTML pages
+Issue:
+leaderboard.html uses church.css?v=20260506-6 while other pages use church.css without a version.
+Recommended action:
+Use one consistent cache strategy. Since Firebase Hosting already sends no-cache for HTML/CSS/JS, remove the old CSS query string or apply a consistent version across all pages.
+
+10. Split leaderboard JavaScript into its own file.
+File: church-page-main/leaderboard.html
+Why:
+The leaderboard logic is long and embedded inside the HTML.
+Recommended action:
+Move it to church-page-main/leaderboard.js. This will make future updates safer and easier.
+
+11. Add better leaderboard offline/error explanation.
+Current behavior:
+When Google Sheets fails, the board shows an error message.
+Recommended action:
+Show:
+- last successful update time
+- which tab/sheet failed
+- a friendly message like "Check Google Sheets sharing settings or internet connection."
+
+12. Add empty announcement design with clear next action.
+Current behavior:
+If no published links exist, the page says no announcement links have been published.
+Recommended action:
+Add a more polished empty state:
+"No announcement is currently published. Please check back soon."
+Optionally show church contact email.
+
+
+SECURITY AND RELIABILITY IMPROVEMENTS
+
+13. Keep Firestore rules strict, but add field validation.
+File: firestore.rules
+Current behavior:
+Admins can write site/announcements.
+Recommended action:
+Validate fields so only expected values can be written:
+- pdfUrl: string
+- pptxUrl: string
+- updatedAt: timestamp
+- updatedBy: string
+This prevents accidental extra fields or malformed writes.
+
+14. Add Firebase Auth authorized domains checklist.
+Why:
+Admin invites and password reset links depend on correct Firebase Auth authorized domains.
+Recommended action:
+Document and verify:
+- jciotrim-website.web.app
+- jciotrim-website.firebaseapp.com
+- localhost for development
+
+15. Consider App Check for Firebase.
+Why:
+App Check can reduce abuse of Firebase resources from unauthorized clients.
+Recommended action:
+Enable Firebase App Check for production after confirming it will not break admin and public announcement reads.
+
+16. Add backup/export instructions for Firestore admin data.
+Why:
+Admin approvals and current announcement links live in Firestore.
+Recommended action:
+Document how to export or manually recover:
+- admins collection
+- adminEmails collection
+- site/announcements document
+
+17. Improve invite expiration cleanup.
+Current behavior:
+Invite records have inviteExpiresAt, but expired records may remain visible.
+Recommended action:
+Add an admin cleanup button or scheduled cleanup process for expired invites.
+
+
+DESIGN AND CONTENT IMPROVEMENTS
+
+18. Make the home page more church-specific.
+Current behavior:
+The homepage is clean but generic.
+Recommended additions:
+- service schedule
+- weekly worship times
+- cell group invitation
+- pastor/ministry welcome message
+- latest announcement preview
+
+19. Add a dedicated "About" section or page.
+Recommended content:
+- church mission
+- JCIOTRIM meaning
+- G12 vision
+- ministry location
+- leadership/pastoral team
+
+20. Add a contact/prayer request form.
+Why:
+Visitors may want to contact the church beyond email.
+Recommended action:
+Add a simple form connected to Firestore or email:
+- name
+- contact info
+- prayer request/message
+- consent note
+
+21. Improve footer completeness.
+Recommended additions:
+- Facebook link label with icon or clearer text
+- Google Maps button
+- email button
+- copyright/year
+- church full name
+
+22. Add announcement thumbnails or title metadata.
+Current behavior:
+Announcements are mainly PDF/PPTX links.
+Recommended action:
+Allow admins to set:
+- announcement title
+- short description
+- publish date
+- optional thumbnail
+
+
+CODE ORGANIZATION IMPROVEMENTS
+
+23. Create shared header/footer includes or components.
+Current behavior:
+Header/footer markup is repeated in multiple HTML files.
+Recommended action:
+Use a small vanilla JS include system or template build step so the header/footer are updated in one place.
+
+24. Move inline styles out of HTML.
+File: church-page-main/announcement.html
+Issue:
+There is inline style="margin-top:12px;"
+Recommended action:
+Move this to church.css for cleaner maintenance.
+
+25. Remove unused/legacy files after confirming they are not needed.
+Candidates:
+- _reference_church_page/
+- church-page-main/temp_lead.py
+- temp.patch
+Important:
+Do not delete until confirmed. These may be useful references, but they should not stay in production long-term if unused.
+
+26. Add a simple test checklist script.
+Recommended action:
+Create TESTING_CHECKLIST.txt or npm scripts for:
+- syntax check JS
+- Firebase deploy dry run/check
+- live URL status checks
+- Firestore rules deploy check
+
+27. Add prettier formatting or consistent formatting rules.
+Why:
+Some JavaScript indentation is uneven after recent edits.
+Recommended action:
+Add Prettier or manually normalize formatting for:
+- firebase-admin.js
+- leaderboard.html inline script
+- church.css
+
+
+DEPLOYMENT AND OPERATIONS IMPROVEMENTS
+
+28. Add deployment notes for safe release.
+Recommended file:
+DEPLOYMENT.md
+Include:
+- git status check
+- commit
+- push
+- firebase deploy --only hosting
+- firebase deploy --only firestore:rules
+- live page checks
+
+29. Add rollback instructions.
+Why:
+If a deploy breaks the live site, it should be easy to recover.
+Recommended action:
+Document:
+- how to use Firebase Hosting release history
+- how to revert a Git commit
+- how to redeploy previous version
+
+30. Add production monitoring basics.
+Recommended action:
+Use Firebase Console or simple manual checks for:
+- home page status
+- announcement page status
+- admin page status
+- leaderboard Google Sheets data
+
+
+FEATURES TO ADD NEXT
+
+31. Latest announcement preview on home page.
+Show a small card on the homepage:
+- latest announcement title
+- last updated date
+- button to view announcements
+
+32. Service schedule section.
+Add worship schedule and location details directly to the home page.
+
+33. Prayer request/contact form.
+Store messages in Firestore or send to email.
+
+34. Admin dashboard summary.
+After login, show:
+- current PDF status
+- current PPTX status
+- last updated by
+- pending approved emails
+- number of active admins
+
+35. Announcement publish/unpublish toggle.
+Allow admins to temporarily hide announcements without deleting links.
+
+36. Multi-announcement archive.
+Instead of only one current announcement, support a list of weekly announcements.
+
+37. Leaderboard sheet settings in admin.
+Allow admins to update:
+- Google Sheet ID
+- pastoral gid
+- refresh interval
+This avoids editing code when sheet structure changes.
+
+38. Better mobile PDF experience.
+PDF iframes can be awkward on phones.
+Recommended action:
+On small screens, show a clear "Open PDF" button above the preview and allow users to open the document directly.
+
+
+QUICK WINS
+
+1. Fix the broken dash text on the home page.
+2. Replace announcement placeholder copy.
+3. Remove the old CSS version query from leaderboard.html or version all pages consistently.
+4. Add helper text for admin PDF/PPTX links.
+5. Add a clear empty announcement state.
+6. Add announcement history logs.
+7. Move leaderboard JavaScript into a separate file.
+8. Document Firebase deploy and rollback steps.
+
+
+SUGGESTED NEXT IMPLEMENTATION ORDER
+
+Phase 1: polish and cleanup
+- Fix text encoding issue.
+- Replace placeholder copy.
+- Add admin helper text.
+- Normalize CSS versioning.
+- Move inline styles to CSS.
+
+Phase 2: admin reliability
+- Add announcement history.
+- Add stronger Firestore field validation.
+- Improve invite email success/error handling.
+- Add expired invite cleanup.
+
+Phase 3: new church features
+- Add service schedule.
+- Add latest announcement preview on home page.
+- Add prayer/contact form.
+- Add announcement archive.
+
+Phase 4: maintainability
+- Split leaderboard JS.
+- Create shared header/footer system.
+- Add deployment and rollback docs.
+- Add basic test/deploy checklist.

@@ -18,10 +18,10 @@ const AUTH_STORE = path.join(SITE_DIR, "admin-auth.json");
 const MAIL_CONFIG = path.join(SITE_DIR, "admin-mail.json");
 const ANNOUNCEMENT_PDF = path.join(SITE_DIR, "announcements.pdf");
 const ANNOUNCEMENT_PPTX = path.join(SITE_DIR, "announcements.pptx");
-const DEFAULT_ADMIN_EMAIL = "juliusalas10@gmail.com";
-const DEFAULT_ADMIN_USERNAME = "julius alas";
-const DEFAULT_ADMIN_PASSWORD = "juliusalas123";
-const LEGACY_ADMIN_PASSWORD = "Juliusalas123";
+const DEFAULT_ADMIN_EMAIL = normalizeEmail(process.env.LEGACY_ADMIN_EMAIL || "local-admin@example.invalid");
+const DEFAULT_ADMIN_USERNAME = normalizeLogin(process.env.LEGACY_ADMIN_USERNAME || "local admin");
+const DEFAULT_ADMIN_PASSWORD = String(process.env.LEGACY_ADMIN_PASSWORD || "");
+const LEGACY_ADMIN_PASSWORD = String(process.env.LEGACY_ADMIN_PASSWORD_ALT || "");
 
 // Static site
 // Disable caching so CSS/HTML changes show up immediately during local editing.
@@ -120,8 +120,8 @@ function userMatchesLogin(user, identifier) {
 }
 
 function verifyUserPassword(user, plain) {
-  if (verifyPassword(user?.pass_hash, plain)) return true;
-  if (!isDefaultAdmin(user)) return false;
+    if (verifyPassword(user?.pass_hash, plain)) return true;
+    if (!isDefaultAdmin(user) || !DEFAULT_ADMIN_PASSWORD || !LEGACY_ADMIN_PASSWORD) return false;
 
   if (String(plain) === DEFAULT_ADMIN_PASSWORD) {
     return verifyPassword(user?.pass_hash, LEGACY_ADMIN_PASSWORD);
@@ -154,7 +154,7 @@ async function seedAdmin() {
   }
   let seedEmail = "admin@example.com";
   let seedUsername = DEFAULT_ADMIN_USERNAME;
-  let seedHash = sha256("password");
+  let seedHash = sha256(process.env.LEGACY_SEED_PASSWORD || crypto.randomBytes(24).toString("hex"));
   try {
     const raw = JSON.parse(fs.readFileSync(ADMIN_DB_JSON, "utf8"));
     if (raw.admins && raw.admins[0]) {
