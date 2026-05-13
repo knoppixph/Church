@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="JCIOTRIM admin inbox for prayer and contact request messages.">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="JCIOTRIM">
+    <meta property="og:title" content="JCIOTRIM Admin Inbox">
+    <meta property="og:description" content="Admin-only inbox for prayer and contact request messages.">
+    <meta property="og:url" content="https://jciotrim-website.web.app/admin-messages.html">
+    <meta property="og:image" content="https://jciotrim-website.web.app/CHURCH_LOGO.png">
+    <title>JCIOTRIM | Admin Inbox</title>
+    <link rel="icon" type="image/png" href="CHURCH_LOGO.png">
+    <link rel="apple-touch-icon" href="CHURCH_LOGO.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@700;800;900&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="church.css">
+</head>
+<body class="messages-page">
+    <div class="site-loader" role="status" aria-live="polite" aria-label="Loading">
+        <div class="loader-content">
+            <div class="loader-cross" aria-hidden="true"></div>
+            <p class="loader-title">Jesus Christ</p>
+            <p class="loader-subtitle">Is Our True Religion</p>
+        </div>
+    </div>
+
+    <div data-site-header></div>
+
+    <main class="shell page-content">
+        <section class="page-hero">
+            <p class="eyebrow">Admin inbox</p>
+            <h2>Prayer and contact requests</h2>
+            <p class="lede">Read, track, and clear messages submitted from the public home page prayer/contact form.</p>
+            <p class="doc-note" id="messagesStatus" aria-live="polite">Checking admin access...</p>
+        </section>
+
+        <section class="doc-section" id="messagesAuthSection">
+            <article class="card">
+                <h3>Admin sign-in</h3>
+                <form id="messagesLoginForm" class="login-form">
+                    <label>Email<br><input type="email" id="messagesEmail" autocomplete="username" required></label>
+                    <label>Password<br><input type="password" id="messagesPassword" autocomplete="current-password" required></label>
+                    <button type="submit" class="button primary">Sign in</button>
+                    <p class="doc-note" id="messagesLoginStatus" aria-live="polite"></p>
+                </form>
+            </article>
+        </section>
+
+        <section class="doc-section" id="messagesAdminSection" hidden>
+            <div class="admin-toolbar">
+                <p class="doc-note" id="messagesCurrentAdmin"></p>
+                <div class="cta-group">
+                    <button type="button" class="button ghost" id="refreshMessages">Refresh</button>
+                    <button type="button" class="button ghost" id="messagesLogout">Sign out</button>
+                </div>
+            </div>
+
+            <div class="message-list" id="messageList" aria-live="polite"></div>
+        </section>
+    </main>
+
+    <div data-site-footer></div>
+
+    <script src="site-layout.js"></script>
+    <script src="site-loader.js"></script>
+    <script type="module" src="firebase-messages.js"></script>
+</body>
+</html>

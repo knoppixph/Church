@@ -14,8 +14,8 @@
         const target = document.querySelector("[data-site-header]");
         if (!target) return;
 
-        const items = document.body.classList.contains("admin-page")
-            ? [...navItems, ["admin.html", "Admin"]]
+        const items = document.body.classList.contains("admin-page") || document.body.classList.contains("messages-page")
+            ? [...navItems, ["admin.html", "Admin"], ["admin-messages.html", "Inbox"]]
             : navItems;
         const nav = items
             .map(([href, label]) => `<li><a href="${href}"${isActive(href) ? ' aria-current="page"' : ""}>${label}</a></li>`)
