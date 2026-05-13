@@ -73,6 +73,38 @@ function setStatus(el, msg, isError = false) {
     el.style.color = isError ? "#f29b9b" : "";
 }
 
+function getToastRegion() {
+    let region = document.querySelector(".toast-region");
+    if (region) return region;
+
+    region = document.createElement("div");
+    region.className = "toast-region";
+    region.setAttribute("aria-live", "polite");
+    region.setAttribute("aria-atomic", "true");
+    document.body.appendChild(region);
+    return region;
+}
+
+function showToast(message, type = "success") {
+    const region = getToastRegion();
+    const toast = document.createElement("div");
+    toast.className = `toast ${type === "error" ? "is-error" : "is-success"}`;
+    toast.textContent = message;
+    region.appendChild(toast);
+    setTimeout(() => toast.remove(), 4200);
+}
+
+async function runWithLoader(action, control) {
+    if (control) control.disabled = true;
+    window.showLoader?.();
+    try {
+        return await action();
+    } finally {
+        window.hideLoader?.();
+        if (control) control.disabled = false;
+    }
+}
+
 function strongPassword(value) {
     return /[a-z]/.test(value) && /[A-Z]/.test(value) && /\d/.test(value) && value.length >= 8;
 }
@@ -223,12 +255,16 @@ async function handleLogin(event) {
     const email = document.getElementById("identifier").value.trim();
     const password = document.getElementById("password").value;
 
+    await runWithLoader(async () => {
     try {
         await signInWithEmailAndPassword(auth, email, password);
         setStatus(loginStatus, "Welcome.");
+        showToast("Signed in successfully.");
     } catch (err) {
         setStatus(loginStatus, err.message, true);
+        showToast(err.message, "error");
     }
+    }, event.submitter);
 }
 
 async function handleForgotPassword() {
@@ -241,14 +277,18 @@ async function handleForgotPassword() {
 
     setStatus(loginStatus, "Sending password reset email...");
 
+    await runWithLoader(async () => {
     try {
         await sendPasswordResetEmail(auth, email, {
             url: `${window.location.origin}${window.location.pathname}`
         });
         setStatus(loginStatus, "Password reset email sent. Check your inbox or spam folder.");
+        showToast("Password reset email sent.");
     } catch (err) {
         setStatus(loginStatus, err.message, true);
+        showToast(err.message, "error");
     }
+    }, document.getElementById("forgotPasswordButton"));
 }
 
 async function handleCreateAccount(event) {
@@ -270,19 +310,23 @@ async function handleCreateAccount(event) {
     }
 
     if (inviteParams) {
-        await handleInviteAccountCreate(email, password);
+        await runWithLoader(() => handleInviteAccountCreate(email, password), event.submitter);
         return;
     }
 
+    await runWithLoader(async () => {
     try {
         const credential = await createUserWithEmailAndPassword(auth, email, password);
         await sendEmailVerification(credential.user);
         document.getElementById("registerForm").reset();
         setStatus(registerStatus, "Account created. Verify the email, then sign in.");
+        showToast("Account created. Please verify the email.");
         await signOut(auth);
     } catch (err) {
         setStatus(registerStatus, err.message, true);
+        showToast(err.message, "error");
     }
+    }, event.submitter);
 }
 
 async function handleInviteAccountCreate(email, password) {
@@ -300,6 +344,7 @@ async function handleInviteAccountCreate(email, password) {
         window.history.replaceState({}, "", "admin.html");
         document.getElementById("registerForm").reset();
         setStatus(registerStatus, "Admin account activated.");
+        showToast("Admin account activated.");
         await showAuthed(credential.user, adminData);
     } catch (err) {
         if (credential?.user) {
@@ -312,6 +357,7 @@ async function handleInviteAccountCreate(email, password) {
             ? "This invite was already used. Sign in with the password that was created for this email."
             : "This invite link is invalid, expired, or already used.";
         setStatus(registerStatus, message, true);
+        showToast(message, "error");
     } finally {
         inviteClaimInProgress = false;
     }
@@ -355,6 +401,7 @@ async function handleSaveLinks(event) {
         return;
     }
 
+    await runWithLoader(async () => {
     try {
         await setDoc(doc(db, FIRESTORE_PATHS.site, FIRESTORE_PATHS.announcements), {
             pdfUrl,
@@ -363,16 +410,20 @@ async function handleSaveLinks(event) {
             updatedBy: auth.currentUser?.email || ""
         }, { merge: true });
         setStatus(linkStatus, "Announcement links saved.");
+        showToast("Announcement links saved.");
         await loadAnnouncementLinks();
     } catch (err) {
         setStatus(linkStatus, err.message, true);
+        showToast(err.message, "error");
     }
+    }, event.submitter);
 }
 
 async function handleClear(kind) {
     setStatus(removeStatus, `Clearing ${kind.toUpperCase()} link...`);
     const field = kind === "pptx" ? "pptxUrl" : "pdfUrl";
 
+    await runWithLoader(async () => {
     try {
         await setDoc(doc(db, FIRESTORE_PATHS.site, FIRESTORE_PATHS.announcements), {
             [field]: "",
@@ -380,10 +431,13 @@ async function handleClear(kind) {
             updatedBy: auth.currentUser?.email || ""
         }, { merge: true });
         setStatus(removeStatus, `${kind.toUpperCase()} link cleared.`);
+        showToast(`${kind.toUpperCase()} link cleared.`);
         await loadAnnouncementLinks();
     } catch (err) {
         setStatus(removeStatus, err.message, true);
+        showToast(err.message, "error");
     }
+    }, document.getElementById(kind === "pptx" ? "removePptx" : "removePdf"));
 }
 
 async function handleChangePassword(event) {
@@ -410,15 +464,19 @@ async function handleChangePassword(event) {
         return;
     }
 
+    await runWithLoader(async () => {
     try {
         const credential = EmailAuthProvider.credential(user.email, currentPassword);
         await reauthenticateWithCredential(user, credential);
         await updatePassword(user, newPassword);
         document.getElementById("changePasswordForm").reset();
         setStatus(passwordStatus, "Password updated.");
+        showToast("Password updated.");
     } catch (err) {
         setStatus(passwordStatus, err.message, true);
+        showToast(err.message, "error");
     }
+    }, event.submitter);
 }
 
 function makeInviteMailto(email, inviteToken) {
@@ -468,6 +526,7 @@ async function handleApproveAdmin(event) {
         return;
     }
 
+    await runWithLoader(async () => {
     try {
         const key = emailKey(email);
         const inviteToken = makeInviteToken();
@@ -494,10 +553,13 @@ async function handleApproveAdmin(event) {
 
         document.getElementById("approveAdminForm").reset();
         renderInviteStatus(email, emailRequested, inviteToken, emailError);
+        showToast(emailRequested ? "Invite email request sent." : "Admin email approved.");
         await refreshAdmins();
     } catch (err) {
         setStatus(inviteStatus, err.message, true);
+        showToast(err.message, "error");
     }
+    }, event.submitter);
 }
 
 function renderInviteStatus(email, emailRequested = false, inviteToken = "", emailError = "") {
@@ -586,13 +648,17 @@ async function handleAdminListClick(event) {
     const key = button.dataset.removeApproved;
     setStatus(inviteStatus, "Removing approval...");
 
+    await runWithLoader(async () => {
     try {
         await deleteDoc(doc(db, FIRESTORE_PATHS.adminEmails, key));
         setStatus(inviteStatus, "Approval removed.");
+        showToast("Approval removed.");
         await refreshAdmins();
     } catch (err) {
         setStatus(inviteStatus, err.message, true);
+        showToast(err.message, "error");
     }
+    }, button);
 }
 
 onAuthStateChanged(auth, async (user) => {

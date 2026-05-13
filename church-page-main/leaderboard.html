@@ -3,14 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Cell leadership achiever dashboard for men, women, and pastoral teams.">
-    <title>Church Leadership Board</title>
+    <meta name="description" content="JCIOTRIM cell leadership achiever dashboard for men, women, and pastoral teams.">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="JCIOTRIM">
+    <meta property="og:title" content="JCIOTRIM Leadership Board">
+    <meta property="og:description" content="Cell leadership achiever dashboard for men, women, and pastoral teams.">
+    <meta property="og:url" content="https://jciotrim-website.web.app/leaderboard.html">
+    <meta property="og:image" content="https://jciotrim-website.web.app/CHURCH_LOGO.png">
+    <meta property="og:image:secure_url" content="https://jciotrim-website.web.app/CHURCH_LOGO.png">
+    <meta property="og:image:width" content="200">
+    <meta property="og:image:height" content="200">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="JCIOTRIM Leadership Board">
+    <meta name="twitter:description" content="Cell leadership achiever dashboard for men, women, and pastoral teams.">
+    <meta name="twitter:image" content="https://jciotrim-website.web.app/CHURCH_LOGO.png">
+    <title>JCIOTRIM | Leadership Board</title>
+    <link rel="icon" type="image/png" href="CHURCH_LOGO.png">
+    <link rel="apple-touch-icon" href="CHURCH_LOGO.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@700;800;900&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="church.css?v=20260506-6">
 </head>
 <body class="leaderboard-page">
+    <div class="site-loader" role="status" aria-live="polite" aria-label="Loading">
+        <div class="loader-content">
+            <div class="loader-cross" aria-hidden="true"></div>
+            <p class="loader-title">Jesus Christ</p>
+            <p class="loader-subtitle">Is Our True Religion</p>
+        </div>
+    </div>
     <header class="site-header">
         <div class="shell masthead">
             <img src="CHURCH_LOGO.png" alt="Church Logo" class="logo-badge">
@@ -96,6 +118,7 @@
         </div>
     </footer>
 
+    <script src="site-loader.js"></script>
     <script>
     const sheetID = "1q1fRR6UB8OGFpy_JoeZm_f8pnI7NLH9yW5S-Phbnbj8";
     const pastoralSheetGid = "1653163612";
@@ -459,6 +482,7 @@
     }
 
     let isLoading = false;
+    let hasLoadedOnce = false;
 
     async function loadData() {
       if (isLoading) {
@@ -466,7 +490,11 @@
       }
 
       isLoading = true;
+      const showPageLoader = !hasLoadedOnce;
       updateStatus("Refreshing attendance data...");
+      if (showPageLoader) {
+        window.showLoader?.();
+      }
 
       try {
         let rows = [];
@@ -536,6 +564,7 @@
         }).format(new Date());
         const pastoralNote = pastoralSheet ? ` + ${pastoralSheet}` : "";
         updateStatus(`Updated ${updatedAt}; auto-refresh every ${refreshIntervalSeconds}s. Showing ${titleDateLabel()} from ${mainSheet}${pastoralNote ? ` (main)${pastoralNote} (pastoral)` : " sheet"}.`);
+        hasLoadedOnce = true;
       } catch (error) {
         console.error(error);
         render("menList", []);
@@ -544,6 +573,10 @@
         updateStatus("Unable to load attendance data. Open this page through a browser with internet access.", true);
       } finally {
         isLoading = false;
+        if (showPageLoader) {
+          hasLoadedOnce = true;
+          window.hideLoader?.();
+        }
       }
     }
 

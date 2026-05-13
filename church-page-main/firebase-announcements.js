@@ -44,6 +44,7 @@ function updateButton(anchor, url, enabledText, disabledText) {
 
 async function loadAnnouncements() {
     setStatus("Loading announcements...");
+    window.showLoader?.();
 
     try {
         const ref = doc(db, FIRESTORE_PATHS.site, FIRESTORE_PATHS.announcements);
@@ -72,6 +73,8 @@ async function loadAnnouncements() {
     } catch (err) {
         console.error(err);
         setStatus("Announcements could not load from Firebase.", true);
+    } finally {
+        window.hideLoader?.();
     }
 }
 
